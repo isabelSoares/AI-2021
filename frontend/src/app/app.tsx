@@ -1,11 +1,13 @@
 import React from 'react';
+import {AskUser} from "@/components/AskUser";;
+
 
 const App = () => {
-  return (
-    <div className="app">
-      <h1> I am React running in Electron App!! </h1>
-    </div>
-  );
+    return (
+        <div>
+            <AskUser />
+        </div>
+    );
 }
 
 export default App;
