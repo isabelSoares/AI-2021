@@ -12,6 +12,7 @@ import Alert from '@material-ui/lab/Alert';
 
 import {User, load_user} from '@/classes/User';
 
+// Definition of Props and State
 type LoginUserProps = {}
 type LoginUserState = {
     // General attributes
@@ -34,7 +35,6 @@ export class LoginUser extends Component<LoginUserProps, LoginUserState> {
     }
     
     render() {
-        
         return (
             <div>
                 {this.state.error && <Alert
