@@ -1,0 +1,91 @@
+// =========================== Variable ===========================
+$background-color: rgba(225, 247, 226, 1);
+$accent-color: rgba(21, 77, 24, 1);
+$button-color: rgba(23, 115, 28, 1);
+
+html {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    background-color: $background-color;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    font-family:Arial;
+    width: 500px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 2rem;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
+    border-top: 5px solid $accent-color;
+}
+
+form .Button {
+    margin: 25px 0px 10px 0px;
+}
+
+form .Button.LoginButton:not(.Mui-disabled) {
+    background-color: $button-color;
+    color: white;
+}
+
+form .TextField {
+    margin: 10px 0px 5px 0px;
+}
+
+form .TextField .MuiFormLabel-root.Mui-focused {
+    color: green;
+}
+
+form .TextField .MuiInput-underline:after {
+    border-bottom-color: $button-color;
+}
+
+.Panel {
+    margin: 5% 5% 5% 5%;
+    background-color: white;
+    padding: 2rem;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
+    border-top: 5px solid $button-color;
+}
+
+.SelectionPanel {
+    margin: 5% 5% 5% 5%;
+    background-color: white;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
+    padding: 0%;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .Title {
+        padding: 1% 1% 1% 2%;
+        background-color: $accent-color;
+
+        p {
+            font-size: larger;
+            margin: 0%;
+            color: white;
+        }
+    }
+
+    .content {
+        padding: 2% 5% 5% 5%;
+    }
+
+    .options {
+
+        .SelectionButton {
+            margin: 1% 1% 1% 1%;
+            padding: 16px 16px 16px 16px; 
+        }
+    }
+}

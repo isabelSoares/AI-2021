@@ -1,36 +1,38 @@
-import React, {Component} from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import { Redirect } from "react-router-dom";
+import { ReduxType, mapStateToProps, mapDispatcherToProps } from '@/utils/store/storeEndpoint';
 
 import axios from 'axios';
 
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import SendIcon from '@material-ui/icons/Send';
 import CloseIcon from '@material-ui/icons/Close';
 import Alert from '@material-ui/lab/Alert';
 
 import {User, load_user} from '@/classes/User';
 
-// Definition of Props and State
-type LoginUserProps = {}
+import '@/general.scss';
+
+// Definition of State
 type LoginUserState = {
     // General attributes
     error: string | undefined,
     // Specific attributes
     userID: string | undefined,
-    user: User | undefined,
+    userPassword: string | undefined,
 }
 
-export class LoginUser extends Component<LoginUserProps, LoginUserState> {
-    constructor(props: LoginUserProps) {
+class LoginUser extends React.Component<ReduxType, LoginUserState> {
+    constructor(props: ReduxType) {
         super(props);
         this.state = {
             // General attributes
             error: undefined,
             // Specific attributes
             userID: undefined,
-            user: undefined,
+            userPassword: undefined,
         }
     }
     
@@ -52,17 +54,18 @@ export class LoginUser extends Component<LoginUserProps, LoginUserState> {
                     >
                     TestError
                 </Alert>}
-                {this.state.user && <Redirect to={"/info-panel"} />}
-                <form noValidate autoComplete="off">
-                    <TextField onChange={this._handleTextFieldChange} id="standard-basic" label="User ID" />
-                    <Button
+                {this.props.user && <Redirect to={"/info-panel"} />}
+                <form className='center' noValidate autoComplete="off">
+                    <TextField className="TextField" onChange={this._handleTextFieldChange} required id="userId" label="User ID" />
+                    <TextField className="TextField" onChange={this._handleTextFieldChange} id="password" label="Password" type="password"/>
+                    <Button className="Button LoginButton"
+                        disabled={!this.state.userID}
                         variant="contained"
                         color="default"
                         size="small"
-                        endIcon={<SendIcon />}
                         onClick={this._handleSendUser}
                         >
-                        Send
+                        Login
                     </Button>
                 </form>
             </div>
@@ -72,14 +75,22 @@ export class LoginUser extends Component<LoginUserProps, LoginUserState> {
     // ============================== INPUT EVENTS ==============================
 
     _handleTextFieldChange = (e: React.ChangeEvent<{ value: string }>) => {
-        this.setState(state => ({ userID: e.target.value == "" ? undefined : e.target.value}));
+        if (e.target instanceof Element) {
+            switch(e.target.id) {
+                case 'userId':
+                    this.setState(state => ({ userID: e.target.value == "" ? undefined : e.target.value}));
+                    break;
+                case 'password':
+                    this.setState(state => ({ userPassword: e.target.value == "" ? undefined : e.target.value}));
+                    break;
+            }
+        }
     }
 
     _handleSendUser = async () => {
         if (this.state.userID != undefined) {
             getInformation(this.state.userID).then(user => {
-                this.setState(state => ({ user: user }))
-                console.log(this.state.user);
+                this.props.saveUser(user);
             }).catch(error => {
                 this._openAlert(error);
             });
@@ -104,5 +115,7 @@ async function getInformation(userID : string) : Promise<User> {
     if (typeof response.data === "string") {
         console.log("ERROR");
         throw new Error();
-    } else return load_user(response.data)
+    } else return load_user(userID, response.data)
 }
+
+export default connect(mapStateToProps, mapDispatcherToProps) (LoginUser);

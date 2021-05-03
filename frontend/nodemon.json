@@ -2,7 +2,9 @@
     "watch": [ 
       "src/main.ts", 
       "src/electron/*",
-      "src/app/*"
+      "src/app/*",
+      "src/components/*",
+      "src/classes/*"
     ],
     "exec": "webpack --config ./webpack.electron.js && electron ./dist/main.js",
     "ext": "ts,tsx"
