@@ -4,7 +4,10 @@ $accent-color: rgba(21, 77, 24, 1);
 $button-color: rgba(23, 115, 28, 1);
 
 $appbar-height: 50px;
-$drawer-width: 200px;
+$drawer-width-close: 60px;
+$drawer-min-width-open: 200px;
+$drawer-width-open: 15%;
+$drawer-list-item-heihgt: 48px;
 
 html {
     height: 100%;
@@ -107,14 +110,77 @@ form .TextField .MuiInput-underline:after {
         background-color: $accent-color;
         color: white;
         height: $appbar-height;
+        z-index: 2;
 
         .MuiToolbar-regular {
             min-height: 0;
+            padding-left: 16px;
         }
     }
 
     .Drawer .MuiDrawer-paper {
-        width: $drawer-width;
+        z-index: 1;
+        visibility: visible !important;
+        transform: translate(0px) !important;
+        width: $drawer-width-close;
+        overflow: hidden;
+
+        .TopPart {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        .Options {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-content: space-between;
+            height: 100%;
+
+            .OptionSelected {
+                background-color: $accent-color;
+
+                .MuiListItem-button {     
+                    height: $drawer-list-item-heihgt;
+                }
+
+                .MuiListItemIcon-root {
+                    color: white;
+                }
+
+                .MuiListItemText-root {
+                    color: white;
+                }
+            }
+        }
+    }
+    
+    .AppContent {
+        margin-top: $appbar-height;
+        margin-left: $drawer-width-close;
+        padding: 20px 20px 20px 20px;
+    }
+}
+
+.MainPage.drawerOpen {
+
+    .AppBar {
+        z-index: 0;
+
+        .MuiToolbar-regular {
+            margin-left: calc(max(#{$drawer-min-width-open}, #{$drawer-width-open}));
+
+            .MuiTypography-root {
+                padding-top: 8px;
+            }
+        }
+    }
+
+    .Drawer .MuiDrawer-paper {
+        min-width: $drawer-min-width-open;
+        width: $drawer-width-open;
 
         .TopPart {
             display: flex;
@@ -123,27 +189,9 @@ form .TextField .MuiInput-underline:after {
             justify-content: flex-end;
         }
     }
-    
-    .AppContent {
-        margin-top: $appbar-height;
-        padding: 20px 20px 20px 20px;
-    }
-}
-
-.MainPage.drawerOpen {
-
-    .AppBar {
-        .MuiToolbar-regular {
-            margin-left: $drawer-width;
-
-            .MuiTypography-root {
-                padding-top: 8px;
-            }
-        }
-    }
 
     .AppContent {
         margin-top: $appbar-height;
-        margin-left: $drawer-width;
+        margin-left: calc(max(#{$drawer-min-width-open}, #{$drawer-width-open}));
     }
 }

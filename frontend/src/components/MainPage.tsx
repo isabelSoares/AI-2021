@@ -15,8 +15,12 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+
+import ApartmentIcon from '@material-ui/icons/Apartment';
+import DevicesIcon from '@material-ui/icons/Devices';
+import DateRangeIcon from '@material-ui/icons/DateRange';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 import InfoPanelComponent from "@/components/InfoPanel";
 const InfoPanel = () => { return(<InfoPanelComponent/>) }
@@ -25,6 +29,7 @@ import '@/general.scss';
 
 // Definition of State
 type MainPageState = {
+    selectedOption: { 'key': string, 'title': string },
     // Design state
     drawerOpen: boolean,
 }
@@ -33,6 +38,7 @@ class MainPage extends React.Component<ReduxType, MainPageState> {
     constructor(props: ReduxType) {
         super(props);
         this.state = {
+            selectedOption: { 'key': 'DivisionSelection', 'title': 'Division Selection'},
             // Design state
             drawerOpen: false,
         }
@@ -45,8 +51,27 @@ class MainPage extends React.Component<ReduxType, MainPageState> {
     _handleDrawerClose = () => {
         this.setState(state => ({ drawerOpen: false }));
     };
+
+    handleClickedOption(option: { key: string, title: string }) {
+        if (this.state.selectedOption.key == option.key) return;
+        this.setState(state => ({ selectedOption: option }));
+    }
     
     render() {
+
+        let drawerOptions = {
+            'top': [
+                { 'key': 'DivisionSelection', 'icon': <ApartmentIcon/>, 'text': 'Division Selection' },
+                { 'key': 'Devices', 'icon': <DevicesIcon/>, 'text': 'Devices' },
+            ],
+
+            'bottom': [
+                { 'key': 'ScheduledEvents', 'icon': <DateRangeIcon/>, 'text': 'Scheduled Events' },
+                { 'key': 'Favorites', 'icon': <FavoriteIcon/>, 'text': 'Favorites' },
+                { 'key': 'Settings', 'icon': <SettingsIcon/>, 'text': 'Settings' },
+            ],
+        }
+
         return (
             <div className={"MainPage " + (this.state.drawerOpen ? "drawerOpen" : "drawerClose")}>
                 {!this.props.user && <Redirect to={"/"} />}
@@ -63,7 +88,7 @@ class MainPage extends React.Component<ReduxType, MainPageState> {
                         </IconButton>
                     } 
                     <Typography variant="h6" noWrap>
-                        Mini variant drawer
+                            Home Smart Home: { this.state.selectedOption.title }
                     </Typography>
                     </Toolbar>
                 </AppBar>
@@ -78,14 +103,25 @@ class MainPage extends React.Component<ReduxType, MainPageState> {
                         </IconButton>
                     </div>
                     <Divider />
-                    <List>
-                        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                            <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                            </ListItem>
+                    <div className="Options">
+                        {[drawerOptions.top, drawerOptions.bottom].map((options, index) => (
+                            <div key={index}>
+                                <List>
+                                    {options.map((item, index) => (
+                                        <ListItem
+                                            key={item.key}
+                                            button={(this.state.selectedOption.key != item.key) as any}
+                                            className={this.state.selectedOption.key == item.key ? "OptionSelected" : ""}
+                                            onClick={() => this.handleClickedOption({ 'key': item.key, 'title': item.text })}
+                                        >
+                                            <ListItemIcon>{item.icon}</ListItemIcon>
+                                            <ListItemText primary={item.text} />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </div>
                         ))}
-                    </List>
+                    </div>
                 </Drawer>
                 <main className="AppContent">
                     <InfoPanel />
