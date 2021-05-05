@@ -1,7 +1,10 @@
-// =========================== Variable ===========================
+// =========================== Variables ===========================
 $background-color: rgba(225, 247, 226, 1);
 $accent-color: rgba(21, 77, 24, 1);
 $button-color: rgba(23, 115, 28, 1);
+
+$appbar-height: 50px;
+$drawer-width: 200px;
 
 html {
     height: 100%;
@@ -15,6 +18,14 @@ html {
 
 *, *:before, *:after {
     box-sizing: inherit;
+}
+
+body {
+    margin: 0px 0px 0px 0px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 form {
@@ -87,5 +98,52 @@ form .TextField .MuiInput-underline:after {
             margin: 1% 1% 1% 1%;
             padding: 16px 16px 16px 16px; 
         }
+    }
+}
+
+.MainPage {
+
+    .AppBar {
+        background-color: $accent-color;
+        color: white;
+        height: $appbar-height;
+
+        .MuiToolbar-regular {
+            min-height: 0;
+        }
+    }
+
+    .Drawer .MuiDrawer-paper {
+        width: $drawer-width;
+
+        .TopPart {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+    }
+    
+    .AppContent {
+        margin-top: $appbar-height;
+        padding: 20px 20px 20px 20px;
+    }
+}
+
+.MainPage.drawerOpen {
+
+    .AppBar {
+        .MuiToolbar-regular {
+            margin-left: $drawer-width;
+
+            .MuiTypography-root {
+                padding-top: 8px;
+            }
+        }
+    }
+
+    .AppContent {
+        margin-top: $appbar-height;
+        margin-left: $drawer-width;
     }
 }

@@ -31,8 +31,6 @@ export class User {
                 console.log("ERROR");
             } else this.houses?.push(load_house(path_to_house_corrected, response.data));
         }));
-
-        console.log(this.houses);
     }
 }
 

@@ -3,8 +3,8 @@ import { HashRouter, Route, Switch } from 'react-router-dom';
 // ==================== Component ==================== 
 import LoginUserComponent from "@/components/LoginUser";
 const LoginUser = () => { return(<LoginUserComponent/>) }
-import InfoPanelComponent from "@/components/InfoPanel";
-const InfoPanel = () => { return(<InfoPanelComponent/>) }
+import MainPageComponent from "@/components/MainPage";
+const MainPage = () => { return(<MainPageComponent/>) }
 
 class App extends React.Component {
     public render() {
@@ -13,7 +13,7 @@ class App extends React.Component {
             <div className="App">
                 <Switch>
                     <Route exact path="/" component={LoginUser}/>
-                    <Route exact path="/info-panel" component={InfoPanel}/>
+                    <Route exact path="/main-page" component={MainPage}/>
                 </Switch>
             </div>
             </HashRouter>

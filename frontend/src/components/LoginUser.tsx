@@ -54,7 +54,7 @@ class LoginUser extends React.Component<ReduxType, LoginUserState> {
                     >
                     TestError
                 </Alert>}
-                {this.props.user && <Redirect to={"/info-panel"} />}
+                {this.props.user && <Redirect to={"/main-page"} />}
                 <form className='center' noValidate autoComplete="off">
                     <TextField className="TextField" onChange={this._handleTextFieldChange} required id="userId" label="User ID" />
                     <TextField className="TextField" onChange={this._handleTextFieldChange} id="password" label="Password" type="password"/>
