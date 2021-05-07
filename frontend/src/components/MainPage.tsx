@@ -22,8 +22,8 @@ import DateRangeIcon from '@material-ui/icons/DateRange';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import SettingsIcon from '@material-ui/icons/Settings';
 
-import InfoPanelComponent from "@/components/InfoPanel";
-const InfoPanel = () => { return(<InfoPanelComponent/>) }
+import InfoPanel from "@/components/InfoPanel";
+import DevicesPanel from "@/components/DevicesPanel";
 
 import '@/general.scss';
 
@@ -124,7 +124,8 @@ class MainPage extends React.Component<ReduxType, MainPageState> {
                     </div>
                 </Drawer>
                 <main className="AppContent">
-                    <InfoPanel />
+                    {this.state.selectedOption.key == "DivisionSelection" && <InfoPanel />}
+                    {this.state.selectedOption.key == "Devices" && <DevicesPanel />}
                 </main>
             </div>
         )
