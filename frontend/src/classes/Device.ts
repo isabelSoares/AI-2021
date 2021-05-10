@@ -7,8 +7,10 @@ export class Device {
     name: string;
     favorite : boolean;
     path_deviceType: string;
-    deviceType: DeviceType | undefined;
     paths_propertyValues: string[];
+
+    // Objects
+    deviceType: DeviceType | undefined;
 
     constructor(id: string, name: string, favorite: boolean, path_deviceType: string, paths_propertyValues: string[]) {
         this.id = id;
@@ -23,6 +25,10 @@ export class Device {
 
     async pre_load() {
         await this.load_deviceType();
+    }
+
+    async full_load() {
+        await this.deviceType?.load_properties();
     }
 
     async load_deviceType() {

@@ -260,9 +260,75 @@ form .TextField .MuiInput-underline:after {
     height: 600px;
     margin: 0px 0px 0px 0px;
     background-color: white;
-    padding: 2rem;
+    padding: 15px 15px 15px 15px;
     box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
     border-top: 5px solid $accent-color;
+
+    .DeviceHeader {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 10px 10px 10px;
+
+        .DeviceName {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            font-weight: bold;
+            font-size: large;
+        }
+
+        .DeviceType {
+            margin-bottom: 0px;
+            margin-top: 8px;
+            font-size: small;
+        }
+
+        .MuiIconButton-root {
+            padding: 5px 5px 5px 5px;
+
+            .NonFavoriteIcon {
+                fill: $accent-color;
+            }
+
+            .FavoriteIcon {
+                fill: $accent-color;
+            }
+        }
+    }
+
+    .MuiDivider-root {
+        margin: 5px 0px 10px 10px;
+    }
+
+    .AccordionTitle {
+        margin: 0px 0px 0px 0px;
+
+    }
+
+    .MuiAccordionSummary-root.Mui-expanded {
+        min-height: 30px;
+        height: 30px;
+        background-color: $accent-color;
+        color: white;
+
+        .MuiAccordionSummary-content {
+            margin: 8px 0px;
+        }
+
+        .MuiSvgIcon-root {
+            fill: white;
+        }
+    }
+    
+    .MuiAccordionSummary-root:not(.Mui-expanded) {
+        height: 40px;
+        background-color: $background-color;
+    }
+
+    .MuiAccordionDetails-root {
+        background-color: $background-color;
+    }
 }
 
 p {

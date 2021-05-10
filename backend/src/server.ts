@@ -97,7 +97,7 @@ app.get('/property/:property_id', (req, res) => {
     let property_id = req.params['property_id'];
     get_document('properties', property_id).then((data) => {
         if (data == undefined) logger.info("ERROR: Property not found");
-        else console.log(load_property(data));
+        else res.send(JSON.stringify(load_property(data)));
     });
 });
 
@@ -106,7 +106,7 @@ app.get('/property_value/:property_value_id', (req, res) => {
     let property_value_id = req.params['property_value_id'];
     get_document('propertyValues', property_value_id).then((data) => {
         if (data == undefined) logger.info("ERROR: Property value not found");
-        else console.log(load_propertyValue(data));
+        else res.send(JSON.stringify(load_propertyValue(data)));
     });
 });
 
@@ -115,7 +115,7 @@ app.get('/schedule/:schedule_id', (req, res) => {
     let schedule_id = req.params['schedule_id'];
     get_document('schedules', schedule_id).then((data) => {
         if (data == undefined) logger.info("ERROR: Schedule not found");
-        else console.log(load_schedule(data));
+        else res.send(JSON.stringify(load_schedule(data)));
     });
 });
 
@@ -124,7 +124,7 @@ app.get('/preference/:preference_id', (req, res) => {
     let preference_id = req.params['preference_id'];
     get_document('preferences', preference_id).then((data) => {
         if (data == undefined) logger.info("ERROR: Preference not found");
-        else console.log(load_preference(data));
+        else res.send(JSON.stringify(load_preference(data)));
     });
 });
 
@@ -133,7 +133,7 @@ app.get('/value_history/:value_history_id', (req, res) => {
     let value_history_id = req.params['value_history_id'];
     get_document('valuesHistory', value_history_id).then((data) => {
         if (data == undefined) res.send("ERROR: Value History not found");
-        else console.log(load_valueHistory(data));
+        else res.send(JSON.stringify(load_valueHistory(data)));
     });
 });
 
