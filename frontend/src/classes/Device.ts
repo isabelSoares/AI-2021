@@ -1,6 +1,7 @@
-import axios from 'axios';
+import { DeviceType } from '@/classes/DeviceType';
+import { PropertyValue } from '@/classes/PropertyValue';
 
-import { DeviceType, load_deviceType } from '@/classes/DeviceType';
+import Router from '@/utils/endpointAPI';
 
 export class Device {
     id: string;
@@ -11,15 +12,18 @@ export class Device {
 
     // Objects
     deviceType: DeviceType | undefined;
+    propertyValues: PropertyValue[] | undefined;
 
     constructor(id: string, name: string, favorite: boolean, path_deviceType: string, paths_propertyValues: string[]) {
         this.id = id;
         this.name = name;
         this.favorite = favorite;
         this.path_deviceType = path_deviceType;
-        this.deviceType = undefined;
         this.paths_propertyValues = paths_propertyValues;
-
+        // Objects
+        this.deviceType = undefined;
+        this.propertyValues = undefined;
+        
         this.pre_load();
     }
 
@@ -28,19 +32,29 @@ export class Device {
     }
 
     async full_load() {
-        await this.deviceType?.load_properties();
+        await this.load_propertyValues().then(async () => {
+            if (!this.propertyValues) return;
+
+            await Promise.all(this.propertyValues.map(async (propertyValue) => {
+                await propertyValue.load_property();
+            }));
+        });
     }
 
     async load_deviceType() {
-        let address : string = "http://localhost:8000/deviceType/";
+        let deviceType_id = this.path_deviceType.replace("deviceTypes/", "");
+        this.deviceType = await Router.load_deviceType(deviceType_id);
+    }
 
-        let path_to_deviceType_corrected = this.path_deviceType.replace("deviceTypes/", "");
-        let complete_address = address + path_to_deviceType_corrected;
-        const response = await axios.get(complete_address);
+    async load_propertyValues() {
+        this.propertyValues = [];
+        
+        await Promise.all(this.paths_propertyValues.map(async (path_propertyValue) => {
+            let propertyValue_id = path_propertyValue.replace("propertyValues/", "");
+            let propertyValue = await Router.load_propertyValue(propertyValue_id);
 
-        if (typeof response.data === "string") {
-            console.log("ERROR");
-        } else this.deviceType = load_deviceType(path_to_deviceType_corrected, response.data);
+            this.propertyValues?.push(propertyValue);
+        }));
     }
 }
 

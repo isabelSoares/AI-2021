@@ -1,9 +1,9 @@
-import axios from 'axios';
+import { House } from '@/classes/House';
+import { Floor } from '@/classes/Floor';
+import { Division } from '@/classes/Division';
+import { Device } from '@/classes/Device';
 
-import { House, load_house } from '@/classes/House';
-import { Floor, load_floor } from '@/classes/Floor';
-import { Division, load_division } from '@/classes/Division';
-import { Device, load_device } from '@/classes/Device';
+import Router from '@/utils/endpointAPI';
 
 export class User {
     id: string;
@@ -51,68 +51,49 @@ export class User {
     // ==================== LOAD OBJECTS ====================
 
     async load_houses() {
-        let address : string = "http://localhost:8000/house/";
         this.houses = [];
         
         await Promise.all(this.paths_houses.map(async (path_to_house) => {
-            let path_to_house_corrected = path_to_house.replace("houses/", "");
-            let complete_address = address + path_to_house_corrected;
-            const response = await axios.get(complete_address);
+            let house_id = path_to_house.replace("houses/", "");
+            let house = await Router.load_house(house_id);
 
-            if (typeof response.data === "string") {
-                console.log("ERROR");
-            } else this.houses?.push(load_house(path_to_house_corrected, response.data));
+            this.houses?.push(house);
         }));
     }
 
     async load_floors() {
         if (this.paths_floors == undefined) return;
-
-        let address : string = "http://localhost:8000/floor/";
         this.floors = [];
         
         await Promise.all(this.paths_floors.map(async (path_to_floor) => {
-            let path_to_floor_corrected = path_to_floor.replace("floors/", "");
-            let complete_address = address + path_to_floor_corrected;
-            const response = await axios.get(complete_address);
+            let floor_id = path_to_floor.replace("floors/", "");
+            let floor = await Router.load_floor(floor_id);
 
-            if (typeof response.data === "string") {
-                console.log("ERROR");
-            } else this.floors?.push(load_floor(path_to_floor_corrected, response.data));
+            this.floors?.push(floor);
         }));
     }
     
     async load_divisions() {
         if (this.paths_divisions == undefined) return;
-
-        let address : string = "http://localhost:8000/division/";
         this.divisions = [];
         
-        await Promise.all(this.paths_divisions.map(async (path_to_division) => {
-            let path_to_division_corrected = path_to_division.replace("divisions/", "");
-            let complete_address = address + path_to_division_corrected;
-            const response = await axios.get(complete_address);
+        await Promise.all(this.paths_divisions.map(async (path_to_house) => {
+            let division_id = path_to_house.replace("divisions/", "");
+            let division = await Router.load_division(division_id);
 
-            if (typeof response.data === "string") {
-                console.log("ERROR");
-            } else this.divisions?.push(load_division(path_to_division_corrected, response.data));
+            this.divisions?.push(division);
         }));
     }
 
     async load_devices() {
         if (this.paths_devices == undefined) return;
-
-        let address : string = "http://localhost:8000/device/";
-        this.devices = [];
+        this.devices = []; this.devices = [];
         
         await Promise.all(this.paths_devices.map(async (path_to_device) => {
-            let path_to_device_corrected = path_to_device.replace("devices/", "");
-            let complete_address = address + path_to_device_corrected;
-            const response = await axios.get(complete_address);
+            let device_id = path_to_device.replace("devices/", "");
+            let device = await Router.load_device(device_id);
 
-            if (typeof response.data === "string") {
-                console.log("ERROR");
-            } else this.devices?.push(load_device(path_to_device_corrected, response.data));
+            this.devices?.push(device);
         }));
     }
 

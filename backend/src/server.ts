@@ -83,7 +83,7 @@ app.get('/device/:device_id', (req, res) => {
     });
 });
 
-app.get('/deviceType/:deviceType_id', (req, res) => {
+app.get('/device_type/:deviceType_id', (req, res) => {
 
     let deviceType_id = req.params['deviceType_id'];
     get_document('deviceTypes', deviceType_id).then((data) => {    

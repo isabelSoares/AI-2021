@@ -6,6 +6,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 
 import Favorite from '@material-ui/icons/Favorite';
 import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
@@ -38,7 +39,6 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
     componentDidMount() {
         this.props.device?.full_load().finally(() => {
             this.forceUpdate();
-            console.log("Properties: ", this.props.device?.deviceType?.properties);
         });
     }
 
@@ -67,7 +67,31 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                 <p className="AccordionTitle">Properties</p>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <p>Properties will be here</p>
+                                {this.props.device.propertyValues && this.props.device.propertyValues.map((propertyValue, index) => {
+                                    return (
+                                        <div key={propertyValue.id}>
+                                            <div className="Property">
+                                                <div className="PropertyHeader">
+                                                    <p className="PropertyName">{propertyValue.property?.name}</p>
+                                                    <p className="PropertyValue">{propertyValue.value}</p>
+                                                </div>
+                                                {propertyValue.property?.type.type == "Enum" && <p>{propertyValue.property?.type.format()}</p>}
+                                                {propertyValue.property?.type.type == "Scalar" && <p>{propertyValue.property?.type.format()}</p>}
+                                            </div>
+                                            <Divider />
+                                        </div>
+                                    )
+                                })}
+                                <div>
+                                <Button className="Button LoginButton"
+                                    variant="contained"
+                                    color="default"
+                                    size="small"
+                                    onClick={() => {}}
+                                    >
+                                    Save
+                                </Button>
+                                </div>
                             </AccordionDetails>
                         </Accordion>
                         <Accordion expanded={this.state.expandedAccordion === 'graph'} onChange={() => this._handleAccordionChange('graph')}>

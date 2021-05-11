@@ -1,8 +1,6 @@
-import axios from 'axios';
+import { Property } from '@/classes/Property';
 
-import { Property, load_property } from '@/classes/Property';
-import { load_propertyScalar } from '@/classes/PropertyScalar';
-import { load_propertyEnum } from '@/classes/PropertyEnum';
+import Router from '@/utils/endpointAPI';
 
 export class DeviceType {
     id: string;
@@ -20,24 +18,13 @@ export class DeviceType {
     }
 
     async load_properties() {
-        let address : string = "http://localhost:8000/property/";
         this.properties = [];
         
         await Promise.all(this.paths_properties.map(async (path_to_property) => {
-            let path_to_property_corrected = path_to_property.replace("properties/", "");
-            let complete_address = address + path_to_property_corrected;
-            const response = await axios.get(complete_address);
+            let property_id = path_to_property.replace("properties/", "");
+            let property = await Router.load_property(property_id);
 
-            if (typeof response.data === "string") {
-                console.log("ERROR");
-            } else {
-                let new_property;
-                if (response.data.type == "SCALAR") new_property = load_propertyScalar(path_to_property_corrected, response.data);
-                else if (response.data.type == "ENUM") new_property = load_propertyEnum(path_to_property_corrected, response.data);
-                else new_property = load_property(path_to_property_corrected, response.data);
-                
-                this.properties?.push(new_property);
-            }
+            this.properties?.push(property);
         }));
     }
 }
