@@ -19,8 +19,16 @@ class RouterAPI {
     async get(address: string) : Promise<AxiosResponse<any>> {
         return axios.get(address);
     }
+
+    async post(address: string, body: any) : Promise<AxiosResponse<any>> {
+        return axios.post(address, body);
+    }
+
+    async delete(address: string) : Promise<AxiosResponse<any>> {
+        return axios.delete(address);
+    }
     
-    // ================ SPECIFIC REQUESTS ================
+    // ================ SPECIFIC REQUESTS : LOADS  ================
     async load_deviceType(device_type_id: string) : Promise<DeviceType> {
         let address : string = this.domain + "device_type/" + device_type_id;
 
@@ -110,6 +118,43 @@ class RouterAPI {
                     console.log("ERROR");
                     reject();
                 } else resolve(load_propertyValue(propertyValue_id, response.data));
+            });
+        });
+    }
+    
+    async load_favorites(user_id: string) {
+        let address : string = this.domain + "favorites/" + user_id;
+
+        let response = await this.get(address);
+        if (typeof response.data === "string") {
+            console.log("ERROR");;
+            return [];
+        } else {
+            let devices : Device[] = await Promise.all(response.data.map(async (device_data: {'id': string, 'device': any}) => {
+                return await load_device(device_data.id, device_data.device);
+            }));
+            return devices;
+        }
+    }
+
+    // ================ SPECIFIC REQUESTS : CHANGES  ================
+
+    async add_favorites(device_id: string) {
+        let address : string = this.domain + "favorites/" + device_id;
+
+        return new Promise<void>((resolve, reject) => {
+            this.post(address, {}).then(() => {
+                resolve();
+            });
+        });
+    }
+
+    async remove_favorites(device_id: string) {
+        let address : string = this.domain + "favorites/" + device_id;
+
+        return new Promise<void>((resolve, reject) => {
+            this.delete(address).then(() => {
+                resolve();
             });
         });
     }

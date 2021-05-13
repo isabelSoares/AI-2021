@@ -23,8 +23,6 @@ export class Device {
         // Objects
         this.deviceType = undefined;
         this.propertyValues = undefined;
-        
-        this.pre_load();
     }
 
     async pre_load() {
@@ -56,10 +54,25 @@ export class Device {
             this.propertyValues?.push(propertyValue);
         }));
     }
+
+    // ==================== CHANGE EVENTS ====================
+    async change_favorite_state() {
+        if (this.favorite) Router.remove_favorites(this.id);
+        else Router.add_favorites(this.id);
+        
+        this.favorite = !this.favorite;
+    }
+
+    change_property_value(propertyValue_id: string, value: number) {
+        let propertyValue = this.propertyValues?.find((propertyValue) => propertyValue.id == propertyValue_id);
+        if (propertyValue != undefined) { return propertyValue.set_value(value); }
+        return true;
+    }
 }
 
-export function load_device(id: string, data : {name: string, favorite: boolean, path_deviceType: string, paths_propertyValues: string[]}) : Device {
+export async function load_device(id: string, data : {name: string, favorite: boolean, path_deviceType: string, paths_propertyValues: string[]}) : Promise<Device> {
     let new_device = new Device(id, data.name, data.favorite, data.path_deviceType , data.paths_propertyValues);
+    await new_device.pre_load()
 
     return new_device;
 }

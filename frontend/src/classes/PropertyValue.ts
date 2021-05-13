@@ -22,6 +22,11 @@ export class PropertyValue {
         let property_id = this.path_property.replace("properties/", "");
         this.property = await Router.load_property(property_id);
     }
+
+    set_value(value: number) : boolean {
+        this.value = value;
+        return this.property != undefined && this.property.type.check_valid_value(value);
+    }
 }
 
 export function load_propertyValue(id: string, data : {value: number, path_property: string}) : PropertyValue {

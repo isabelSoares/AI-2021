@@ -1,12 +1,17 @@
 import React from 'react';
 
+import clone from 'clone';
+import underscore from 'underscore';
+
 import Divider from '@material-ui/core/Divider';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import Favorite from '@material-ui/icons/Favorite';
 import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
@@ -23,6 +28,8 @@ type DeviceDialogProps = {
 }
 
 type DeviceDialogState = {
+    copy_device: Device | undefined,
+    invalid_inputs: string[],
     // Design state
     expandedAccordion: string | undefined,
 }
@@ -32,12 +39,16 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
         super(props);
 
         this.state = {
+            copy_device: clone(this.props.device),
+            invalid_inputs: [],
+            // Design state
             expandedAccordion: 'properties'
         }
     }
 
     componentDidMount() {
         this.props.device?.full_load().finally(() => {
+            this.setState(state => ({ copy_device: clone(this.props.device) }));
             this.forceUpdate();
         });
     }
@@ -52,7 +63,7 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                 <p className="DeviceName"> {this.props.device.name} </p>
                                 <p className="DeviceType"> {this.props.device.name} </p>
                             </div>
-                            <IconButton color="primary" component="span">
+                            <IconButton color="primary" component="span" onClick={() => this._handleChangeFavoriteState()}>
                                 {this.props.device.favorite && <Favorite className="FavoriteIcon"/>}
                                 {!this.props.device.favorite && <FavoriteBorder className="NonFavoriteIcon"/>}
                             </IconButton>
@@ -73,24 +84,45 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                             <div className="Property">
                                                 <div className="PropertyHeader">
                                                     <p className="PropertyName">{propertyValue.property?.name}</p>
-                                                    <p className="PropertyValue">{propertyValue.value}</p>
+                                                    {propertyValue.property?.type.type == "Enumerator" && <p className="PropertyType">{propertyValue.property?.type.format()}</p>}
+                                                    {propertyValue.property?.type.type == "Scalar" && <p className="PropertyType">{propertyValue.property?.type.format()}</p>}
                                                 </div>
-                                                {propertyValue.property?.type.type == "Enum" && <p>{propertyValue.property?.type.format()}</p>}
-                                                {propertyValue.property?.type.type == "Scalar" && <p>{propertyValue.property?.type.format()}</p>}
+                                                {propertyValue.property?.type.type == "Enumerator" &&
+                                                    <div className="PropertyValue Enumerator">
+                                                        <TextField className="PropertyValueInput" onChange={this._handleSelectFieldChange}
+                                                            required id="enumeratorValue"label="Value"size="small" name={propertyValue.id}
+                                                            value={propertyValue.value} select
+                                                        >
+                                                            {propertyValue.property?.type.get_values().map((value) => (
+                                                                <MenuItem id={propertyValue.id} key={value.key} value={value.key}>
+                                                                    {value.value}
+                                                                </MenuItem>
+                                                            ))}
+                                                        </TextField>
+                                                    </div>
+                                                }
+                                                {propertyValue.property?.type.type == "Scalar" &&
+                                                    <div className="PropertyValue Scalar">
+                                                        <TextField className="PropertyValueInput" onChange={this._handleTextFieldChange} 
+                                                            required id={propertyValue.id} label="Value" size="small"
+                                                            error={this.state.invalid_inputs.includes(propertyValue.id)}
+                                                            defaultValue={propertyValue.value}/>
+                                                        <p className="PropertyUnits">{propertyValue.property?.type.get_units()}</p>
+                                                    </div>
+                                                }
                                             </div>
                                             <Divider />
                                         </div>
                                     )
                                 })}
-                                <div>
-                                <Button className="Button LoginButton"
-                                    variant="contained"
-                                    color="default"
-                                    size="small"
-                                    onClick={() => {}}
-                                    >
-                                    Save
-                                </Button>
+                                <div className="Buttons">
+                                    <Button className="Button SaveButton"
+                                        variant="contained" color="default" size="small"
+                                        disabled={underscore.isEqual(this.props.device.propertyValues, this.state.copy_device?.propertyValues) || this.state.invalid_inputs.length != 0}
+                                        onClick={() => {}}
+                                        >
+                                        Save
+                                    </Button>
                                 </div>
                             </AccordionDetails>
                         </Accordion>
@@ -117,6 +149,37 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
     _handleAccordionChange = (code: string) => {
         if (this.state.expandedAccordion == code) this.setState(state => ({ expandedAccordion: undefined }));
         else this.setState(state => ({ expandedAccordion: code }));
+    }
+
+    _handleChangeFavoriteState = async () => {
+        this.props.device?.change_favorite_state().then(() => this.forceUpdate());
+    }
+
+    _handleTextFieldChange = (e: React.ChangeEvent<{ value: string }>) => {
+        if (e.target instanceof Element) {
+            let id = e.target.id;
+            let value = parseFloat(e.target.value);
+
+            let valid;
+            if (value == NaN) valid = false; 
+            else valid = this.props.device?.change_property_value(id, parseFloat(e.target.value));
+
+            if (valid && this.state.invalid_inputs.includes(id)) {
+                let new_invalid_inputs = this.state.invalid_inputs.filter((elem) => elem != id);
+                this.setState(state => ({ invalid_inputs: new_invalid_inputs }));
+            } else if (!valid && ! this.state.invalid_inputs.includes(id)) {
+                this.setState(state => ({ invalid_inputs: state.invalid_inputs.concat([id]) }))
+            }
+
+            this.forceUpdate();
+        }
+    }
+
+    _handleSelectFieldChange = (e: React.ChangeEvent<{ value: string }>) => {
+        if (e.currentTarget instanceof Element) {
+            this.props.device?.change_property_value(e.currentTarget.id, parseFloat(e.target.value));
+            this.forceUpdate();
+        }
     }
 }
 

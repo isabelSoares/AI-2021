@@ -21,7 +21,7 @@ type DevicesPanelState = {
     modalOpen: boolean,
 }
 
-class DevicesPanel extends React.Component<ReduxType, DevicesPanelState> {
+class FavoritesPanel extends React.Component<ReduxType, DevicesPanelState> {
     constructor(props: ReduxType) {
         super(props);
 
@@ -33,25 +33,22 @@ class DevicesPanel extends React.Component<ReduxType, DevicesPanelState> {
     }
 
     componentDidMount() {
-        this.props.user?.load_devices().finally(() => {
+        this.props.user?.load_favorites().finally(() => {
             this.forceUpdate();
         });
     }
     
     render() {
         return (
-            <div className="DevicesPanel">
-                {this.props.user?.devices &&
+            <div className="FavoritesPanel">
+                {this.props.user?.favorites &&
                     <div className="SelectionPanel">
                         <div className="Title">
-                            <p> {this.props.user.house_selected?.name + " → "
-                                + this.props.user.floor_selected?.name + " → "
-                                + this.props.user.division_selected?.name}
-                            </p>
+                            <p> Favorite Devices </p>
                         </div>
                         <div className="content">
                             <div className="options">
-                                {this.props.user.devices.map((device, index) => {
+                                {this.props.user.favorites.map((device, index) => {
                                     return (
                                         <Box className="OptionDevice" key={device.id} onClick={() => this._handleClickDevice(device.id)}>
                                             <div className="OptionDeviceHeader">
@@ -83,9 +80,9 @@ class DevicesPanel extends React.Component<ReduxType, DevicesPanelState> {
     // ============================== INPUT EVENTS ==============================
 
     _handleClickDevice = (id: string) => {
-        if (this.props.user == undefined || this.props.user.devices == undefined) return;
+        if (this.props.user == undefined || this.props.user.favorites == undefined) return;
 
-        let selectedDevice = this.props.user.devices.find((element) => element.id == id);
+        let selectedDevice = this.props.user.favorites.find((element) => element.id == id);
 
         this.setState(state => ({
             selectedDevice: selectedDevice,
@@ -95,7 +92,10 @@ class DevicesPanel extends React.Component<ReduxType, DevicesPanelState> {
 
     _handleModalClose = () => {
         this.setState(state => ({ modalOpen: false }));
+        if (this.props.user != undefined && this.props.user.favorites != undefined) {
+            this.props.user.favorites = this.props.user.favorites.filter((device) => device.favorite);
+        }
     }
 }
 
-export default connect(mapStateToProps, mapDispatcherToProps) (DevicesPanel);
+export default connect(mapStateToProps, mapDispatcherToProps) (FavoritesPanel);

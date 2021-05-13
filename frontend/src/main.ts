@@ -5,6 +5,8 @@ const createWindow = (): void => {
     let win = new BrowserWindow({
         width: 1000,
         height: 700,
+        title: "Home Smart Home",
+        icon: './src/resources/Logo1.ico',
         webPreferences: {
             nodeIntegration: true
         }

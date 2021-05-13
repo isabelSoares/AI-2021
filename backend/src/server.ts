@@ -1,6 +1,6 @@
 import express from 'express'
-import { get_document } from './firebase/firebase_connect'
-import { create_root_category } from './log/logger'
+import { get_document, change_document, create_document } from './firebase/firebase_connect';
+import { create_root_category } from './log/logger';
 let logger = create_root_category('SERVER');
 
 // Classes
@@ -16,8 +16,12 @@ import { load_schedule } from './classes/Schedule'
 import { load_preference } from './classes/Preference'
 import { load_valueHistory } from './classes/ValueHistory'
 
+import * as utils from './utils';
+
 const app = express();
 const port = 8000;
+
+app.use(express.json());
 
 app.use(function (req, res, next) {
     // Website you wish to allow to connect
@@ -135,6 +139,37 @@ app.get('/value_history/:value_history_id', (req, res) => {
         if (data == undefined) res.send("ERROR: Value History not found");
         else res.send(JSON.stringify(load_valueHistory(data)));
     });
+});
+
+// ============================ FAVORITES ============================
+
+app.get('/favorites/:user_id', async (req, res) => {
+    
+    let favorites = await utils.get_favorite_devices(req.params['user_id']);
+    res.send(JSON.stringify(favorites));
+});
+
+app.post('/favorites/:device_id', (req, res) => {
+    
+    let device_id = req.params['device_id'];
+    change_document('devices', device_id, { 'favorite': true }).then(() => {
+        res.send(JSON.stringify({ msg: 'success' }));
+    });
+});
+
+app.delete('/favorites/:device_id', (req, res) => {
+    
+    let device_id = req.params['device_id'];
+    change_document('devices', device_id, { 'favorite': false }).then(() => {
+        res.send(JSON.stringify({ msg: 'success' }));
+    });
+});
+
+// ============================ DEAL WITH PROPERTIES ============================
+
+app.post('/property_value/', async (req, res) => {
+    await utils.change_property_value(req.body['propertyValue_id'], req.body['value']);
+    res.send();
 });
 
 app.listen(port, () => {

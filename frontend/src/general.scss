@@ -59,11 +59,11 @@ form .TextField {
     margin: 10px 0px 5px 0px;
 }
 
-form .TextField .MuiFormLabel-root.Mui-focused {
+form .TextField .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
     color: green;
 }
 
-form .TextField .MuiInput-underline:after {
+form .TextField .MuiInput-underline:not(.Mui-error):after {
     border-bottom-color: $button-color;
 }
 
@@ -95,7 +95,7 @@ form .TextField .MuiInput-underline:after {
     }
 
     .content {
-        padding: 5% 5% 5% 5%;
+        padding: 40px 40px 40px 40px;
 
         p {
             margin: 0%
@@ -116,35 +116,40 @@ form .TextField .MuiInput-underline:after {
             border-radius: 10px;
             background-color: $button-unselected-color;
             cursor: pointer;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: start;
 
             .OptionDeviceHeader {
                 display: flex;
-                flex-direction: row;
+                flex-direction: column;
                 justify-content: space-between;
-                align-items: center;
-                margin-bottom: 0px;
 
                 .DeviceName {
                     margin-top: 0px;
                     margin-bottom: 0px;
+                    font-weight: bold;
+                    font-size: 15px;
                 }
 
-                .MuiIconButton-root {
-                    padding: 5px 5px 5px 5px;
-
-                    .NonFavoriteIcon {
-                        fill: $accent-color;
-                    }
-    
-                    .FavoriteIcon {
-                        fill: $accent-color;
-                    }
+                .DeviceType {
+                    margin-bottom: 0px;
+                    margin-top: 8px;
+                    font-size: small;
                 }
             }
 
-            .DeviceType {
-                margin-bottom: 0px;
-                margin-top: 8px;
+            .MuiIconButton-root {
+                padding: 5px 5px 5px 5px;
+
+                .NonFavoriteIcon {
+                    fill: $accent-color;
+                }
+
+                .FavoriteIcon {
+                    fill: $accent-color;
+                }
             }
         }
 
@@ -328,6 +333,70 @@ form .TextField .MuiInput-underline:after {
 
     .MuiAccordionDetails-root {
         background-color: $background-color;
+        display: flex;
+        flex-direction: column;
+
+        .Property {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+
+            .PropertyHeader {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+
+                
+                .PropertyName {
+                    margin-right: 10px;
+                    margin-bottom: 0px;
+                    margin-top: 8px;
+                    font-weight: bold;
+                    font-size: 15px;
+                }
+                
+                .PropertyType{
+                    font-size: small;
+                }
+
+            }
+            
+            .PropertyValue {
+                margin-bottom: 0px;
+                margin-top: 8px;
+                font-size: 15px;
+
+                .PropertyValueInput{
+                    width: 100px;
+                }
+
+                .PropertyValueInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                    color: green;
+                }
+                
+                .PropertyValueInput .MuiInput-underline:not(.Mui-error):after {
+                    border-bottom-color: $button-color;
+                }
+            }
+
+            .PropertyValue.Scalar{
+                display: flex;
+                flex-direction: row;
+            }
+            
+        }
+
+
+        .Buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+
+            .Button.SaveButton:not(.Mui-disabled) {
+                background-color: $accent-color;
+                color: white;
+            }
+        }
     }
 }
 

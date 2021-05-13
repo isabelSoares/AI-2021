@@ -14,6 +14,7 @@ export class User {
     floors: Floor[] | undefined;
     divisions: Division[] | undefined;
     devices: Device[] | undefined;
+    favorites: Device[] | undefined;
     // Selections
     house_id_selected: string | undefined;
     house_selected: House | undefined;
@@ -35,6 +36,7 @@ export class User {
         this.floors = undefined;
         this.divisions = undefined;
         this.devices = undefined;
+        this.favorites = undefined;
         
         // Selections
         this.house_id_selected = undefined;
@@ -87,7 +89,7 @@ export class User {
 
     async load_devices() {
         if (this.paths_devices == undefined) return;
-        this.devices = []; this.devices = [];
+        this.devices = [];
         
         await Promise.all(this.paths_devices.map(async (path_to_device) => {
             let device_id = path_to_device.replace("devices/", "");
@@ -95,6 +97,10 @@ export class User {
 
             this.devices?.push(device);
         }));
+    }
+
+    async load_favorites() {
+        this.favorites = await Router.load_favorites(this.id);
     }
 
     // ==================== SELECTION OBJECTS ====================
