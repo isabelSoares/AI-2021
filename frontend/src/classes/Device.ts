@@ -130,7 +130,7 @@ export class Device {
         let now = moment();
 
         // First filter values for the last 7 days (inclusive)
-        let historyThisWeek = this.valuesHistory.filter(history => history.timestamp.diff(now, 'days') < 7);
+        let historyThisWeek = this.valuesHistory.filter(history => now.diff(history.timestamp, 'days') < 7);
 
         // Divide by days
         let binnedByDate : any = {};

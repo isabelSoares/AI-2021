@@ -1,19 +1,18 @@
 import * as admin from 'firebase-admin';
-
-import { get_reference, get_document, change_document, create_document} from './firebase/firebase_connect'
+import { get_reference, get_document, create_document} from './firebase/firebase_connect';
 
 // Classes
-import { load_user } from './classes/User'
-import { load_house } from './classes/House'
-import { load_floor } from './classes/Floor'
-import { load_division } from './classes/Division'
-import { Device, load_device } from './classes/Device'
-import { load_device_type } from './classes/DeviceType'
-import { load_property } from './classes/Property'
-import { load_propertyValue } from './classes/PropertyValue'
-import { load_schedule } from './classes/Schedule'
-import { load_preference } from './classes/Preference'
-import { load_valueHistory } from './classes/ValueHistory'
+import { load_user } from './classes/User';
+import { load_house } from './classes/House';
+import { load_floor } from './classes/Floor';
+import { load_division } from './classes/Division';
+import { Device, load_device } from './classes/Device';
+import { load_device_type } from './classes/DeviceType';
+import { load_property } from './classes/Property';
+import { load_propertyValue } from './classes/PropertyValue';
+import { load_schedule } from './classes/Schedule';
+import { load_preference } from './classes/Preference';
+import { load_valueHistory } from './classes/ValueHistory';
 
 // Get Favorite Devices
 export async function get_favorite_devices(user_id: string) : Promise<{'id': string, 'device': Device}[]> {

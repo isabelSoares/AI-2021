@@ -18,6 +18,10 @@ import { load_valueHistory } from './classes/ValueHistory'
 
 import * as utils from './utils';
 
+// Run Intelligence Module
+import IntelligenceModule from './intelligence';
+setInterval(() => IntelligenceModule.process_entry(), 2000);
+
 const app = express();
 const port = 8000;
 
