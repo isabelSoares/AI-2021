@@ -68,12 +68,12 @@ export async function get_favorite_devices(user_id: string) : Promise<{'id': str
     return devices.filter((element) => element.device.favorite);
 }
 
-export async function change_property_value(propertyValue_id: string, value: number) {
+export async function change_property_value(propertyValue_id: string, value: number) : Promise<string | undefined> {
 
     // Get property value previously stored
     let previousPropertyValueReference = await get_reference('propertyValues', propertyValue_id);
     let previousPropertyValue = await (await previousPropertyValueReference.get()).data();
-    if (previousPropertyValue == undefined) return;
+    if (previousPropertyValue == undefined) return undefined;
     
     // Create new property and store it
     let newPropertyValueData = {
@@ -104,5 +104,5 @@ export async function change_property_value(propertyValue_id: string, value: num
     // Store back information
     deviceReference.update({ 'propertyValues': newDeviceProperties, 'valuesHistory': deviceValuesHistory });
 
-    return;
+    return newPropertyValueReference.id;
 }

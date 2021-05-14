@@ -168,8 +168,10 @@ app.delete('/favorites/:device_id', (req, res) => {
 // ============================ DEAL WITH PROPERTIES ============================
 
 app.post('/property_value/', async (req, res) => {
-    await utils.change_property_value(req.body['propertyValue_id'], req.body['value']);
-    res.send();
+    let new_id = await utils.change_property_value(req.body['propertyValue_id'], req.body['value']);
+    
+    if (new_id == undefined) res.send("ERROR: Property Value could not be stored");
+    else res.send({'new_id' : new_id});
 });
 
 app.listen(port, () => {

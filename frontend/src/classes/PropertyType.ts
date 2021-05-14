@@ -78,7 +78,6 @@ class PropertyScalar extends PropertyType {
     get_units() : string { return this.units; }
     get_values() : {'key': number, 'value': string}[] { return []; }
     check_valid_value(value: number) {
-        console.log(value);
         let divisible = (Math.round((value / this.step) * 100) / 100) % 1 == 0;
         return value >= this.minValue && value <= this.maxValue && divisible; 
     }

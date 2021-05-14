@@ -1,6 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
 
 import { PropertyValue, load_propertyValue } from '@/classes/PropertyValue';
+import { ValueHistory, load_valueHistory } from '@/classes/ValueHistory';
 import { DeviceType, load_deviceType } from '@/classes/DeviceType';
 import { Property, load_property } from '@/classes/Property';
 import { Division, load_division } from '@/classes/Division';
@@ -137,6 +138,19 @@ class RouterAPI {
         }
     }
 
+    async load_valueHistory(valueHistory_id: string) {
+        let address : string = this.domain + "value_history/" + valueHistory_id;
+
+        return new Promise<ValueHistory>((resolve, reject) => {
+            this.get(address).then(response => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject();
+                } else resolve(load_valueHistory(valueHistory_id, response.data));
+            });
+        });
+    }
+
     // ================ SPECIFIC REQUESTS : CHANGES  ================
 
     async add_favorites(device_id: string) {
@@ -155,6 +169,22 @@ class RouterAPI {
         return new Promise<void>((resolve, reject) => {
             this.delete(address).then(() => {
                 resolve();
+            });
+        });
+    }
+
+    async change_property_value(propertyValue_id: string, new_value: number) : Promise<string> {
+        let address : string = this.domain + "property_value/";
+        let body = { 'propertyValue_id': propertyValue_id, 'value': new_value };
+
+        return new Promise<string>((resolve, reject) => {
+            this.post(address, body).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");;
+                    reject();
+                } else {
+                    resolve(response.data['new_id']);
+                }
             });
         });
     }

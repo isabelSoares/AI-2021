@@ -1,4 +1,5 @@
 import React from 'react';
+import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
 
 import clone from 'clone';
 import underscore from 'underscore';
@@ -7,7 +8,6 @@ import Divider from '@material-ui/core/Divider';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
-import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -21,6 +21,16 @@ import {Device} from '@/classes/Device';
 
 import '@/general.scss';
 
+const graphLines = [
+    {'weekday': 'Sunday', 'color': "#eb4034"},
+    {'weekday': 'Monday', 'color': "#eb9c34"},
+    {'weekday': 'Tuesday', 'color': "#09e31f"},
+    {'weekday': 'Wednesday', 'color': "#5871ed"},
+    {'weekday': 'Thursday', 'color': "#091547"},
+    {'weekday': 'Friday', 'color': "#6e15b3"},
+    {'weekday': 'Saturday', 'color': "#b31544"},
+]
+
 // Definition of State and Props
 type DeviceDialogProps = {
     device: Device | undefined,
@@ -29,6 +39,7 @@ type DeviceDialogProps = {
 
 type DeviceDialogState = {
     copy_device: Device | undefined,
+    data: any | undefined,
     invalid_inputs: string[],
     // Design state
     expandedAccordion: string | undefined,
@@ -40,6 +51,7 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
 
         this.state = {
             copy_device: clone(this.props.device),
+            data: undefined,
             invalid_inputs: [],
             // Design state
             expandedAccordion: 'properties'
@@ -48,7 +60,11 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
 
     componentDidMount() {
         this.props.device?.full_load().finally(() => {
-            this.setState(state => ({ copy_device: clone(this.props.device) }));
+            this.setState(state => ({
+                copy_device: clone(this.props.device),
+                data: this.props.device?.get_graph_data(),
+            }));
+
             this.forceUpdate();
         });
     }
@@ -119,7 +135,7 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                     <Button className="Button SaveButton"
                                         variant="contained" color="default" size="small"
                                         disabled={underscore.isEqual(this.props.device.propertyValues, this.state.copy_device?.propertyValues) || this.state.invalid_inputs.length != 0}
-                                        onClick={() => {}}
+                                        onClick={() => this._handleSaveChanges()}
                                         >
                                         Save
                                     </Button>
@@ -135,7 +151,22 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                 <p className="AccordionTitle">Graphs</p>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <p>Graphs will be here</p>
+                                { this.state.data != undefined &&
+                                    <ResponsiveContainer>
+                                        <LineChart data={this.state.data} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="key" />
+                                            <YAxis allowDecimals={false} />
+                                            <Tooltip />
+                                            <Legend />
+                                            { graphLines.map((line) => {
+                                                return (
+                                                    <Line key={line['weekday']} type="monotone" dataKey={line['weekday']} stroke={line['color']} />
+                                                )
+                                            })}
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                }
                             </AccordionDetails>
                         </Accordion>
                     </div>
@@ -180,6 +211,14 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
             this.props.device?.change_property_value(e.currentTarget.id, parseFloat(e.target.value));
             this.forceUpdate();
         }
+    }
+
+    _handleSaveChanges = async () => {
+        if (this.state.copy_device == undefined) return;
+
+        await this.props.device?.save_new_properties(this.state?.copy_device);
+        this.setState(state => ({ copy_device: clone(this.props.device) }));
+        this.forceUpdate();
     }
 }
 

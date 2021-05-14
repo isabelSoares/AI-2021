@@ -400,6 +400,18 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
     }
 }
 
+.recharts-responsive-container {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    margin-top: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    height: 225px;
+    max-height: 225px;
+    min-height: 225px;
+    background-color: $background-color;
+}
+
 p {
     font-family: Roboto, Arial, Helvetica, sans-serif;
 }

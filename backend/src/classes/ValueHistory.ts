@@ -1,10 +1,10 @@
 export class ValueHistory {
     timestamp: Date;
-    propertyValue: string;
+    path_propertyValue: string;
 
-    constructor(timestamp: Date, propertyValue: string) {
+    constructor(timestamp: Date, path_propertyValue: string) {
         this.timestamp = timestamp;
-        this.propertyValue = propertyValue;
+        this.path_propertyValue = path_propertyValue;
     }
 }
 
