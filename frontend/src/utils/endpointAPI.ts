@@ -42,6 +42,27 @@ class RouterAPI {
             });
         });
     }
+
+    async load_deviceTypes() : Promise<DeviceType[]> {
+        let address : string = this.domain + "device_type/";
+
+        return new Promise<DeviceType[]>((resolve, reject) => {
+            this.get(address).then(response => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject();
+                } else {
+                    let deviceTypes = response.data.map((deviceTypeData: {'id': string, 'object': any}) => {
+                        let id = deviceTypeData.id;
+                        let data = deviceTypeData.object;
+                        return load_deviceType(id, data);
+                    });
+
+                    resolve(deviceTypes);
+                };
+            });
+        });
+    }
     
     async load_house(house_id : string) : Promise<House> {
         let address : string = this.domain + "house/" + house_id;
@@ -147,6 +168,78 @@ class RouterAPI {
                     console.log("ERROR");
                     reject();
                 } else resolve(load_valueHistory(valueHistory_id, response.data));
+            });
+        });
+    }
+
+    // ================ SPECIFIC REQUESTS : POSTS  ================
+
+    async create_new_house(user_id: string, house_data: { 'name': string }) {
+        let address : string = this.domain + 'house/';
+        let body = {'name': house_data.name, 'user_id': user_id};
+
+        return new Promise<House>((resolve, reject) => {
+            this.post(address, body).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else {
+                    resolve(load_house(response.data.id, response.data.object));
+                }
+            });
+        });
+    }
+
+    async create_new_floor(house_id: string, floor_data: { 'name': string }) {
+        let address : string = this.domain + 'floor/';
+        let body = {'name': floor_data.name, 'house_id': house_id};
+
+        return new Promise<Floor>((resolve, reject) => {
+            this.post(address, body).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else {
+                    resolve(load_floor(response.data.id, response.data.object));
+                }
+            });
+        });
+    }
+
+    async create_new_division(floor_id: string, division_data: { 'name': string }) {
+        let address : string = this.domain + 'division/';
+        let body = {'name': division_data.name, 'floor_id': floor_id};
+
+        return new Promise<Division>((resolve, reject) => {
+            this.post(address, body).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else {
+                    resolve(load_division(response.data.id, response.data.object));
+                }
+            });
+        });
+    }
+
+    async create_new_device(division_id: string, device_data: {'name': string, 'favorite': boolean, 'deviceType_id': string, 'propertyValues': {'property_id': string, 'value': number }[]}) {
+        let address : string = this.domain + 'device/';
+        let body = {
+            'name': device_data.name,
+            'division_id': division_id,
+            'deviceType_id': device_data.deviceType_id,
+            'favorite': device_data.favorite,
+            'propertyValues': device_data.propertyValues,
+        };
+
+        return new Promise<Device>((resolve, reject) => {
+            this.post(address, body).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else {
+                    resolve(load_device(response.data.id, response.data.object));
+                }
             });
         });
     }

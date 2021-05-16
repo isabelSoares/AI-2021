@@ -37,6 +37,7 @@ export async function get_favorite_devices(user_id: string) : Promise<{'id': str
             return await get_document('floors', floor_id);
         }));
     }));
+    if (data_floors.length == 0) return [];
     let floors = data_floors.reduce((acc, curVal) => acc.concat(curVal))
         .filter((data_floor): data_floor is FirebaseFirestore.DocumentData => !!data_floor)
         .map((data_floor) => load_floor(data_floor));
@@ -48,6 +49,7 @@ export async function get_favorite_devices(user_id: string) : Promise<{'id': str
             return await get_document('divisions', division_id);
         }));
     }));
+    if (data_divisions.length == 0) return [];
     let divisions = data_divisions.reduce((acc, curVal) => acc.concat(curVal))
         .filter((data_division): data_division is FirebaseFirestore.DocumentData => !!data_division)
         .map((data_division) => load_division(data_division));
@@ -60,6 +62,7 @@ export async function get_favorite_devices(user_id: string) : Promise<{'id': str
             return {'id': device_id, 'device': device};
         }));
     }));
+    if (data_devices.length == 0) return [];
     let devices = data_devices.reduce((acc, curVal) => acc.concat(curVal))
         .filter((data_device): data_device is {'id': string, 'device': FirebaseFirestore.DocumentData} => !!data_device)
         .map((data_device) => { return {'id': data_device.id, 'device': load_device(data_device.device)}});
@@ -104,4 +107,153 @@ export async function change_property_value(propertyValue_id: string, value: num
     deviceReference.update({ 'propertyValues': newDeviceProperties, 'valuesHistory': deviceValuesHistory });
 
     return newPropertyValueReference.id;
+}
+
+export async function add_new_house(name: string, user_id: string) : Promise<FirebaseFirestore.DocumentData | undefined> {
+
+    // Retrieve Reference
+    let userReference = await get_reference('users', user_id);
+
+    // Create Document
+    let houseDataToSave = {
+        'name': name,
+        'users': [userReference],
+        'floors': [],
+    }
+
+    let houseReference = await create_document('houses', houseDataToSave);
+
+    // Load House
+    let houseDocument = await houseReference.get();
+    let houseData = houseDocument.data();
+
+    // Update User
+    let userDocument = await userReference.get();
+    let userData = userDocument.data();
+    if (userData == undefined) return undefined;
+    let user_houses = userData['houses'];
+    user_houses.push(houseReference);
+    await userReference.update({ 'houses': user_houses });
+
+    return { 'id': houseReference.id, 'data': houseData };
+}
+
+export async function add_new_floor(name: string, house_id: string) : Promise<FirebaseFirestore.DocumentData | undefined> {
+
+    // Retrieve Reference
+    let houseReference = await get_reference('houses', house_id);
+
+    // Create Document
+    let floorDataToSave = {
+        'name': name,
+        'house': houseReference,
+        'divisions': [],
+    }
+
+    let floorReference = await create_document('floors', floorDataToSave);
+
+    // Load Floor
+    let floorDocument = await floorReference.get();
+    let floorData = floorDocument.data();
+
+    // Update House
+    let houseDocument = await houseReference.get();
+    let houseData = houseDocument.data();
+    if (houseData == undefined) return undefined;
+    let house_floors = houseData['floors'];
+    house_floors.push(floorReference);
+    await houseReference.update({ 'floors': house_floors });
+
+    return { 'id': floorReference.id, 'data': floorData };
+}
+
+export async function add_new_division(name: string, floor_id: string) : Promise<FirebaseFirestore.DocumentData | undefined> {
+
+    // Retrieve Reference
+    let floorReference = await get_reference('floors', floor_id);
+
+    // Create Document
+    let divisionDataToSave = {
+        'name': name,
+        'floor': floorReference,
+        'devices': [],
+    }
+
+    let divisionReference = await create_document('divisions', divisionDataToSave);
+
+    // Load Division
+    let divisionDocument = await divisionReference.get();
+    let divisionData = divisionDocument.data();
+
+    // Update Floor
+    let floorDocument = await floorReference.get();
+    let floorData = floorDocument.data();
+    if (floorData == undefined) return undefined;
+    let floor_divisions = floorData['divisions'];
+    floor_divisions.push(divisionReference);
+    await floorReference.update({ 'divisions': floor_divisions });
+
+    return { 'id': divisionReference.id, 'data': divisionData };
+}
+
+export async function add_new_device(name: string, division_id: string, deviceType_id: string, favorite: boolean, propertyValues: {'property_id': string, 'value': number}[]) : Promise<FirebaseFirestore.DocumentData | undefined> {
+    
+    // Retrieve Reference Division and Device Type
+    let divisionReference = await get_reference('divisions', division_id);
+    let deviceTypeReference = await get_reference('deviceTypes', deviceType_id);
+    
+    // Create Document
+    let deviceDataToSave = {
+        'name': name,
+        'deviceType': deviceTypeReference,
+        'division': divisionReference,
+        'favorite': favorite,
+        'propertyValues': [],
+        'valuesHistory': [],
+    }
+    
+    let deviceReference = await create_document('devices', deviceDataToSave);
+    
+    // Create Property Values
+    let propertyValueReferences = await Promise.all(propertyValues.map(async (propertyValue) => {
+        let propertyReference = await get_reference('properties', propertyValue.property_id);
+
+        let propertyValueToSave = {
+            'device': deviceReference,
+            'property': propertyReference,
+            'value': propertyValue.value,
+        }
+
+        return await create_document('propertyValues', propertyValueToSave);
+    }));
+
+    // Update device create with new propertyValues
+    deviceReference.update({'propertyValues': propertyValueReferences});
+    
+    // Create Values History for PropertyValues
+    let valuesHistoryReferences = await Promise.all(propertyValueReferences.map(async (propertyValueReference) => {
+        let valueHistoryToSave = {
+            'propertyValue': propertyValueReference,
+            'timestamp': admin.firestore.Timestamp.fromDate(new Date()),
+        }
+        
+        return await create_document('valuesHistory', valueHistoryToSave);
+    }));
+    
+    // Update device create with new valuesHistory
+    deviceReference.update({'valuesHistory': valuesHistoryReferences});
+    
+    // Load Device
+    let deviceDocument = await deviceReference.get();
+    let deviceData = deviceDocument.data();
+
+    // Update Division
+    let divisionDocument = await divisionReference.get();
+    let divisionData = divisionDocument.data();
+    if (divisionData == undefined) return undefined;
+    let division_devices = divisionData['devices'];
+    division_devices.push(deviceReference);
+    await divisionReference.update({ 'devices': division_devices });
+
+    return { 'id': deviceReference.id, 'data': deviceData };
 }

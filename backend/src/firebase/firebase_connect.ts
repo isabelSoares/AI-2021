@@ -14,6 +14,10 @@ export async function get_reference(collection : string, document : string) : Pr
     return await db.doc(collection + '/' + document);
 }
 
+export async function get_all_references(collection : string) : Promise<FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>> {
+    return await db.collection(collection).get();
+}
+
 export async function get_document(collection : string, document : string) : Promise<FirebaseFirestore.DocumentData | undefined> {
     let snapshot = await db.doc(collection + '/' + document).get();
     return snapshot.data();

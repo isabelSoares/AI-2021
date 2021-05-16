@@ -1,5 +1,5 @@
 import express from 'express'
-import { get_document, change_document, create_document } from './firebase/firebase_connect';
+import { get_reference, get_all_references, get_document, change_document, create_document } from './firebase/firebase_connect';
 import { create_root_category } from './log/logger';
 let logger = create_root_category('SERVER');
 
@@ -100,6 +100,17 @@ app.get('/device_type/:deviceType_id', (req, res) => {
     });
 });
 
+app.get('/device_type/', async (req, res) => {
+
+    let deviceTypesRefs = await get_all_references("deviceTypes");
+    let deviceTypes = deviceTypesRefs.docs.map((deviceTypeDocument) => {
+        let deviceTypeData = deviceTypeDocument.data();
+        return {'id': deviceTypeDocument.id,'object': load_device_type(deviceTypeData)};
+    });
+
+    res.send(JSON.stringify(deviceTypes));
+});
+
 app.get('/property/:property_id', (req, res) => {
 
     let property_id = req.params['property_id'];
@@ -143,6 +154,46 @@ app.get('/value_history/:value_history_id', (req, res) => {
         if (data == undefined) res.send("ERROR: Value History not found");
         else res.send(JSON.stringify(load_valueHistory(data)));
     });
+});
+
+// ============================ POST NEW CLASSES ============================
+
+app.post('/house/', (req, res) => {
+
+    utils.add_new_house(req.body['name'], req.body['user_id']).then(data => {
+        if (data == undefined) res.send("ERROR: House not created");
+        else res.send(JSON.stringify({'id': data.id, 'object': load_house(data.data)}));
+    })
+});
+
+app.post('/floor/', (req, res) => {
+
+    utils.add_new_floor(req.body['name'], req.body['house_id']).then(data => {
+        if (data == undefined) res.send("ERROR: Floor not created");
+        else res.send(JSON.stringify({'id': data.id, 'object': load_floor(data.data)}));
+    })
+});
+
+app.post('/division/', (req, res) => {
+
+    utils.add_new_division(req.body['name'], req.body['floor_id']).then(data => {
+        if (data == undefined) res.send("ERROR: Division not created");
+        else res.send(JSON.stringify({'id': data.id, 'object': load_division(data.data)}));
+    })
+});
+
+app.post('/device/', (req, res) => {
+
+    let name : string = req.body['name'];
+    let division_id : string = req.body['division_id'];
+    let deviceType_id : string = req.body['deviceType_id'];
+    let favorite : boolean = req.body['favorite'];
+    let propertyValues : { 'property_id': string, 'value': number }[] = req.body['propertyValues'];
+
+    utils.add_new_device(name, division_id, deviceType_id, favorite, propertyValues).then(data => {
+        if (data == undefined) res.send("ERROR: Device not created");
+        else res.send(JSON.stringify({'id': data.id, 'object': load_device(data.data)}));
+    })
 });
 
 // ============================ FAVORITES ============================

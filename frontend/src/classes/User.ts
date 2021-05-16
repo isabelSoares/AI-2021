@@ -104,7 +104,7 @@ export class User {
     }
 
     // ==================== SELECTION OBJECTS ====================
-
+    
     select_house(id: string) {
         // Clear current information
         this.floors = undefined;
@@ -117,13 +117,13 @@ export class User {
         this.division_id_selected = undefined;
         this.division_selected = undefined;
         this.paths_devices = undefined;
-
+        
         // Select house
         this.house_id_selected = id;
         this.house_selected = this.houses?.find(house => house.id == id);
         this.paths_floors = this.house_selected?.paths_floors;
     }
-
+    
     select_floor(id: string) {
         // Clear current information
         this.divisions = undefined;
@@ -132,26 +132,50 @@ export class User {
         this.division_id_selected = undefined;
         this.division_selected = undefined;
         this.paths_devices = undefined;
-
+        
         // Select floor
         this.floor_id_selected = id;
         this.floor_selected = this.floors?.find(floor => floor.id == id);
         this.paths_divisions = this.floor_selected?.paths_divisions;
     }
-
+    
     select_division(id: string) {
         // Clear current information
         this.devices = undefined;
-
+        
         // Select division
         this.division_id_selected = id;
         this.division_selected = this.divisions?.find(division => division.id == id);
         this.paths_devices = this.division_selected?.paths_devices;
     }
+
+    // ==================== CREATE OBJECTS ====================
+
+    async add_new_house(house_data : {'name': string}) {
+        let newHouse = await Router.create_new_house(this.id, house_data);
+        this.houses?.push(newHouse);
+    }
+    async add_new_floor(floor_data : {'name': string}) {
+        if (this.house_id_selected == undefined) return;
+        let newFloor = await Router.create_new_floor(this.house_id_selected, floor_data);
+        this.floors?.push(newFloor);
+    }
+
+    async add_new_division(division_data : {'name': string}) {
+        if (this.floor_id_selected == undefined) return;
+        let newDivision = await Router.create_new_division(this.floor_id_selected, division_data);
+        this.divisions?.push(newDivision);
+    }
+    
+    async add_new_device(device_data : {'name': string, 'favorite': boolean, 'deviceType_id': string, 'propertyValues': {'property_id': string, 'value': number }[]}) {
+        if (this.division_id_selected == undefined) return;
+        let newDevice = await Router.create_new_device(this.division_id_selected, device_data);
+        this.devices?.push(newDevice);
+    }
 }
 
 export function load_user(id: string, data : {name: string, paths_houses: string[]}) : User {
     let new_user = new User(id, data.name, data.paths_houses);
-
+    
     return new_user;
 }

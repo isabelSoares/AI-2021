@@ -96,72 +96,96 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
 
     .content {
         padding: 40px 40px 40px 40px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
 
-        p {
-            margin: 0%
-        }
-    }
-
-    .options {
-
-        .SelectionButton {
-            margin: 1% 1% 1% 1%;
-            padding: 16px 16px 16px 16px; 
-        }
-
-        .OptionDevice {
-            width: 175px;
-            padding: 10px 10px 10px 10px;
-            box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
-            border-radius: 10px;
-            background-color: $button-unselected-color;
-            cursor: pointer;
+        .main-content {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: start;
+            width: 100%;
 
-            .OptionDeviceHeader {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
+            .options {
 
-                .DeviceName {
-                    margin-top: 0px;
-                    margin-bottom: 0px;
-                    font-weight: bold;
-                    font-size: 15px;
+                .SelectionButton {
+                    margin: 1% 1% 1% 1%;
+                    padding: 16px 16px 16px 16px; 
                 }
-
-                .DeviceType {
-                    margin-bottom: 0px;
-                    margin-top: 8px;
-                    font-size: small;
+        
+                .OptionDevice {
+                    width: 175px;
+                    padding: 10px 10px 10px 10px;
+                    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
+                    border-radius: 10px;
+                    background-color: $button-unselected-color;
+                    cursor: pointer;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: start;
+        
+                    .OptionDeviceHeader {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+        
+                        .DeviceName {
+                            margin-top: 0px;
+                            margin-bottom: 0px;
+                            font-weight: bold;
+                            font-size: 15px;
+                        }
+        
+                        .DeviceType {
+                            margin-bottom: 0px;
+                            margin-top: 8px;
+                            font-size: small;
+                        }
+                    }
+        
+                    .MuiIconButton-root {
+                        padding: 5px 5px 5px 5px;
+        
+                        .NonFavoriteIcon {
+                            fill: $accent-color;
+                        }
+        
+                        .FavoriteIcon {
+                            fill: $accent-color;
+                        }
+                    }
+                }
+        
+                .OptionDevice:hover {
+                    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.35);
+                    background-color: $button-hover-color;
+                }
+        
+                .OptionSelected {
+                    background-color: $accent-color;
+                    color: white;
                 }
             }
 
-            .MuiIconButton-root {
+            p {
+                margin: 0%
+            }
+        }
+
+        .Buttons {
+            .MuiIconButton-root{
                 padding: 5px 5px 5px 5px;
-
-                .NonFavoriteIcon {
+    
+                .AddBoxIcon {
                     fill: $accent-color;
-                }
-
-                .FavoriteIcon {
-                    fill: $accent-color;
+                    width: 1.4em;
+                    height: 1.4em;
                 }
             }
         }
 
-        .OptionDevice:hover {
-            box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.35);
-            background-color: $button-hover-color;
-        }
-
-        .OptionSelected {
-            background-color: $accent-color;
-            color: white;
-        }
     }
 }
 
@@ -386,7 +410,6 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             
         }
 
-
         .Buttons {
             display: flex;
             flex-direction: row;
@@ -410,6 +433,190 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
     max-height: 225px;
     min-height: 225px;
     background-color: $background-color;
+}
+
+.AddComponentDialog {
+    display: flex;
+    flex-direction: column;
+    font-family: Arial;
+    width: 500px;
+    height: 200px;
+    margin: 0px 0px 0px 0px;
+    background-color: white;
+    padding: 15px 15px 15px 15px;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
+    border-top: 5px solid $accent-color;
+
+    .AddComponentHeader {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 5px 10px 10px 10px;
+
+        .ComponentName {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            font-weight: bold;
+            font-size: large;
+        }
+    }
+
+    .AddComponentContent {
+
+        .AddComponentParameter {
+            width: 100%;
+        }
+
+        .AddComponentParameter .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+            color: green;
+        }
+        
+        .AddComponentParameter .MuiInput-underline:not(.Mui-error):after {
+            border-bottom-color: $button-color;
+        }
+    }
+
+    .MuiDivider-root {
+        margin-top: 20px;
+    }
+
+    .Buttons {
+        margin: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+
+        .Button.SaveButton:not(.Mui-disabled) {
+            background-color: $accent-color;
+            color: white;
+        }
+    }
+}
+
+.AddDeviceDialog {
+    display: flex;
+    flex-direction: column;
+    font-family: Arial;
+    width: 500px;
+    height: auto;
+    margin: 0px 0px 0px 0px;
+    background-color: white;
+    padding: 15px 15px 15px 15px;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
+    border-top: 5px solid $accent-color;
+
+    .AddDeviceHeader {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 5px 10px 10px 10px;
+
+        .ComponentName {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            font-weight: bold;
+            font-size: large;
+        }
+    }
+
+    .AddDeviceContent {
+        display: flex;
+        flex-direction: column;
+
+        .Line1 {
+            width: 100%;
+        }
+
+        .Line2 {
+            width: 48%;
+        }
+
+        .Line {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .AddDeviceInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+            color: green;
+        }
+        
+        .AddDeviceInput .MuiInput-underline:not(.Mui-error):after {
+            border-bottom-color: $button-color;
+        }
+    }
+
+    .AddDeviceProperties {
+
+        .AddDeviceProperty {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+
+            .PropertyHeader {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+
+                
+                .PropertyName {
+                    margin-right: 10px;
+                    margin-bottom: 0px;
+                    margin-top: 8px;
+                    font-weight: bold;
+                    font-size: 15px;
+                }
+                
+                .PropertyType{
+                    font-size: small;
+                }
+
+            }
+            
+            .PropertyValue {
+                margin-bottom: 0px;
+                margin-top: 8px;
+                font-size: 15px;
+
+                .PropertyValueInput{
+                    width: 100px;
+                }
+
+                .PropertyValueInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                    color: green;
+                }
+                
+                .PropertyValueInput .MuiInput-underline:not(.Mui-error):after {
+                    border-bottom-color: $button-color;
+                }
+            }
+
+            .PropertyValue.Scalar{
+                display: flex;
+                flex-direction: row;
+            }
+            
+        }
+    }
+
+    .MuiDivider-root {
+        margin-top: 20px;
+    }
+
+    .Buttons {
+        margin: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+
+        .Button.SaveButton:not(.Mui-disabled) {
+            background-color: $accent-color;
+            color: white;
+        }
+    }
 }
 
 p {

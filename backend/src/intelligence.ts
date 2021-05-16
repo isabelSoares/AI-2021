@@ -18,7 +18,7 @@ class IntelligenceModule {
     entriesToCheck: Entry[];
 
     constructor() {
-        this.entriesToCheck = [{'device': '3NBwsKco8OaoI35fApiF', 'property': 'Psw565S3N2c51YxW6Yoq', 'set_value': 1}];
+        this.entriesToCheck = [];
     }
 
     add_entry(entry: Entry) { this.entriesToCheck.push(entry); }

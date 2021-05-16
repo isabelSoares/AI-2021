@@ -29,23 +29,40 @@ class InfoPanel extends React.Component<ReduxType, InfoPanelState> {
                 {this.props.user != undefined && 
                     <SelectionPanel type_name="House" elements={this.props.user.houses}
                         attr_name="name" attr_key="id" on_click={this._handleHouseSelection}
-                        selected_id={this.props.user.house_id_selected} 
+                        selected_id={this.props.user.house_id_selected} save_function={this._saveHouse}
                     />
                 }
                 {this.props.user?.floors != undefined && 
                     <SelectionPanel type_name="Floor" elements={this.props.user.floors}
                         attr_name="name" attr_key="id" on_click={this._handleFloorSelection}
-                        selected_id={this.props.user.floor_id_selected}
+                        selected_id={this.props.user.floor_id_selected} save_function={this._saveFloor}
                     />
                 }
                 {this.props.user?.divisions != undefined && 
                     <SelectionPanel type_name="Division" elements={this.props.user.divisions}
                         attr_name="name" attr_key="id" on_click={this._handleDivisionSelection}
-                        selected_id={this.props.user.division_id_selected}
+                        selected_id={this.props.user.division_id_selected} save_function={this._saveDivision}
                     />
                 }
             </div>
         )
+    }
+
+    // ============================== SAVE EVENTS ==============================
+
+    _saveHouse = async (new_house_data: {'name': string}) => {
+        await this.props.user?.add_new_house(new_house_data);
+        this.forceUpdate();
+    }
+
+    _saveFloor = async (new_floor_data: {'name': string}) => {
+        await this.props.user?.add_new_floor(new_floor_data);
+        this.forceUpdate();
+    }
+    
+    _saveDivision = async (new_division_data: {'name': string}) => {
+        await this.props.user?.add_new_division(new_division_data);
+        this.forceUpdate();
     }
 
     // ============================== INPUT EVENTS ==============================

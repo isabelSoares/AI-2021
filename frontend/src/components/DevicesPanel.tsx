@@ -4,11 +4,14 @@ import { ReduxType, mapStateToProps, mapDispatcherToProps } from '@/utils/store/
 
 import Box from '@material-ui/core/Box';
 import Dialog from '@material-ui/core/Dialog';
+import IconButton from '@material-ui/core/IconButton';
 
-import Favorite from '@material-ui/icons/Favorite';
 import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
+import Favorite from '@material-ui/icons/Favorite';
+import AddBoxIcon from '@material-ui/icons/AddBox';
 
 import DeviceDialog from '@/components/DeviceDialog';
+import AddDeviceDialog from '@/components/AddDeviceDialog';
 
 import { Device } from '@/classes/Device';
 
@@ -18,7 +21,8 @@ import '@/general.scss';
 type DevicesPanelState = {
     selectedDevice: Device | undefined,
     // Design state
-    modalOpen: boolean,
+    modalDeviceOpen: boolean,
+    modalAddDeviceOpen: boolean,
 }
 
 class DevicesPanel extends React.Component<ReduxType, DevicesPanelState> {
@@ -28,7 +32,8 @@ class DevicesPanel extends React.Component<ReduxType, DevicesPanelState> {
         this.state = {
             selectedDevice: undefined,
             // Design state
-            modalOpen: false,
+            modalDeviceOpen: false,
+            modalAddDeviceOpen: false,
         }
     }
 
@@ -50,51 +55,81 @@ class DevicesPanel extends React.Component<ReduxType, DevicesPanelState> {
                             </p>
                         </div>
                         <div className="content">
-                            <div className="options">
-                                {this.props.user.devices.map((device, index) => {
-                                    return (
-                                        <Box className="OptionDevice" key={device.id} onClick={() => this._handleClickDevice(device.id)}>
-                                            <div className="OptionDeviceHeader">
-                                                <p className="DeviceName"> {device.name} </p>
-                                                <p className="DeviceType">
-                                                    {device.deviceType != undefined ? device.deviceType.name : "Unknown"}
-                                                </p>
-                                            </div>
-                                            {device.favorite && <Favorite className="FavoriteIcon"/>}
-                                            {!device.favorite && <FavoriteBorder className="NonFavoriteIcon"/>}
-                                        </Box>
-                                    )
-                                })}
+                            <div className="main-content">
+                                <div className="options">
+                                    {this.props.user.devices.map((device, index) => {
+                                        return (
+                                            <Box className="OptionDevice" key={device.id} onClick={() => this._handleClickDevice(device.id)}>
+                                                <div className="OptionDeviceHeader">
+                                                    <p className="DeviceName"> {device.name} </p>
+                                                    <p className="DeviceType">
+                                                        {device.deviceType != undefined ? device.deviceType.name : "Unknown"}
+                                                    </p>
+                                                </div>
+                                                {device.favorite && <Favorite className="FavoriteIcon"/>}
+                                                {!device.favorite && <FavoriteBorder className="NonFavoriteIcon"/>}
+                                            </Box>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                            <div className="Buttons"> 
+                                <IconButton color="primary" component="span" onClick={() => this._handleClickAddDevice()}>
+                                    <AddBoxIcon className="AddBoxIcon"/>
+                                </IconButton>
                             </div>
                         </div>
                     </div>
                 }
 
                 <Dialog
-                    open={this.state.modalOpen}
-                    onClose={this._handleModalClose}
+                    open={this.state.modalDeviceOpen}
+                    onClose={this._handleModalDeviceClose}
                 >
-                    <DeviceDialog device={this.state.selectedDevice} close_function={this._handleModalClose} />
+                    <DeviceDialog device={this.state.selectedDevice} close_function={this._handleModalDeviceClose} />
+                </Dialog>
+                <Dialog
+                    open={this.state.modalAddDeviceOpen}
+                    onClose={this._handleModalAddDeviceClose}
+                >
+                    <AddDeviceDialog close_function={this._handleModalAddDeviceClose} save_function={this._saveDevice} />
                 </Dialog>
             </div>
         )
     }
 
     // ============================== INPUT EVENTS ==============================
-
+    
     _handleClickDevice = (id: string) => {
         if (this.props.user == undefined || this.props.user.devices == undefined) return;
-
+        
         let selectedDevice = this.props.user.devices.find((element) => element.id == id);
-
+        
         this.setState(state => ({
             selectedDevice: selectedDevice,
-            modalOpen: true,
+            modalDeviceOpen: true,
         }));
     }
+    
+    _handleModalDeviceClose = () => {
+        this.setState(state => ({ modalDeviceOpen: false }));
+    }
+    
+    _handleClickAddDevice = () => {
+        this.setState(state => ({
+            modalAddDeviceOpen: true,
+        }));
+    }
+    
+    _handleModalAddDeviceClose = () => {
+        this.setState(state => ({ modalAddDeviceOpen: false }));
+    }
+    
+    // ============================== SAVE EVENTS ==============================
 
-    _handleModalClose = () => {
-        this.setState(state => ({ modalOpen: false }));
+    _saveDevice = async (new_device_data: {'name': string, 'favorite': boolean, 'deviceType_id': string, 'propertyValues': {'property_id': string, 'value': number }[]}) => {
+        await this.props.user?.add_new_device(new_device_data);
+        this.forceUpdate();
     }
 }
 
