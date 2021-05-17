@@ -1,5 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
 
+import firebase from 'firebase';
+
 import { PropertyValue, load_propertyValue } from '@/classes/PropertyValue';
 import { ValueHistory, load_valueHistory } from '@/classes/ValueHistory';
 import { DeviceType, load_deviceType } from '@/classes/DeviceType';
@@ -8,6 +10,7 @@ import { Division, load_division } from '@/classes/Division';
 import { Device, load_device } from '@/classes/Device';
 import { Floor, load_floor } from '@/classes/Floor';
 import { House, load_house } from '@/classes/House';
+import { User, load_user } from '@/classes/User';
 
 class RouterAPI {
     domain: string;
@@ -30,6 +33,21 @@ class RouterAPI {
     }
     
     // ================ SPECIFIC REQUESTS : LOADS  ================
+
+    async load_user(user_id: string) : Promise<User> {
+        let address : string = this.domain + "user/" + user_id;
+        const response = await axios.get(address);
+
+        return new Promise<User>((resolve, reject) => {
+            this.get(address).then(response => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject();
+                } else resolve(load_user(user_id, response.data));
+            });
+        });
+    }
+
     async load_deviceType(device_type_id: string) : Promise<DeviceType> {
         let address : string = this.domain + "device_type/" + device_type_id;
 
@@ -173,6 +191,34 @@ class RouterAPI {
     }
 
     // ================ SPECIFIC REQUESTS : POSTS  ================
+
+    async create_new_user(name: string, email: string, password: string) : Promise<User | undefined> {
+
+        // Register New User
+        let user = await firebase.auth().createUserWithEmailAndPassword(email, password).then((userCredential) => {
+            return userCredential.user;
+        }).catch((error) => {
+            console.log(error);
+            return null;
+        });
+
+        if (user == null) return undefined;
+
+        // Request to save user on database
+        let address : string = this.domain + 'user/';
+        let body = {'name': name, 'id': user.uid};
+
+        return new Promise<User>((resolve, reject) => {
+            this.post(address, body).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else {
+                    resolve(load_user(response.data.id, response.data.object));
+                }
+            });
+        });
+    }
 
     async create_new_house(user_id: string, house_data: { 'name': string }) {
         let address : string = this.domain + 'house/';

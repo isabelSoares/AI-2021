@@ -1,19 +1,22 @@
 export class Property {
     name: string;
     type: PropertyType;
+    writable: boolean;
 
-    constructor(name: string, type: PropertyType) {
+    constructor(name: string, writable: boolean, type: PropertyType) {
         this.name = name;
+        this.writable = writable;
         this.type = type;
     }
 }
 
 export function load_property(data : FirebaseFirestore.DocumentData) : Property {
     let name : string = data['name'];
+    let writable : boolean = data['writable'];
     let type_name : string = data['type'];
     let type = load_type(type_name, data);
 
-    let new_property = new Property(name, type)
+    let new_property = new Property(name, writable, type)
 
     return new_property;
 }

@@ -9,6 +9,7 @@ export class PropertyType {
     get_units() : string { return "None"; }
     get_values() : {'key': number, 'value': string}[] { return []; }
     check_valid_value(value: number) { console.log("Noooooooooooo"); return false; }
+    get_random() : number { return 0; }
 }
 
 export function load_property_type(data: any) : PropertyType {
@@ -42,6 +43,7 @@ class PropertyEnum extends PropertyType {
     }
 
     check_valid_value(value: number) { return true; }
+    get_random() : number { return Math.round(Math.random() * this.values.length); }
 }
 
 function load_propertyEnum(data : {type: string, values: string[]}) : PropertyEnum {
@@ -81,6 +83,7 @@ class PropertyScalar extends PropertyType {
         let divisible = (Math.round((value / this.step) * 100) / 100) % 1 == 0;
         return value >= this.minValue && value <= this.maxValue && divisible; 
     }
+    get_random() : number { return Math.round(Math.random() * (this.maxValue - this.minValue) / this.step) * this.step + this.minValue; }
 }
 
 function load_propertyScalar(data : {type: string, minValue : number, maxValue : number, step : number, units : string}) : PropertyScalar {

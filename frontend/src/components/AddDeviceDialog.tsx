@@ -81,7 +81,7 @@ class AddDeviceDialog extends React.Component<AddDeviceDialogProps, AddDeviceDia
                 </div>
                 <Divider />
                 <div className="AddDeviceProperties">
-                    {this.state.deviceType != undefined && this.state.deviceType.properties?.map((property) => {
+                    {this.state.deviceType != undefined && this.state.deviceType.properties?.filter((property) => property.writable).map((property) => {
                         return (
                             <div className="AddDeviceProperty" key={property.id}>
                                 <div className="PropertyHeader">
@@ -106,7 +106,7 @@ class AddDeviceDialog extends React.Component<AddDeviceDialogProps, AddDeviceDia
                                 {property.type.type == "Scalar" &&
                                     <div className="PropertyValue Scalar">
                                         <TextField className="PropertyValueInput" onChange={this._handleTextFieldChange} 
-                                            required id={property.id} label="Value" size="small"
+                                            required id={property.id} label="Value" size="small" defaultValue=""
                                             error={this.state.invalid_inputs.includes(property.id)} />
                                         <p className="PropertyUnits">{property.type.get_units()}</p>
                                     </div>
@@ -188,7 +188,9 @@ class AddDeviceDialog extends React.Component<AddDeviceDialogProps, AddDeviceDia
                     // Save and Load properties Value
                     if (this.state.deviceType == undefined || this.state.deviceType.properties == undefined) break;
                     let new_properties = this.state.deviceType.properties.map((property) => {
-                        return {'property': property, 'value': undefined}
+                        let value = undefined;
+                        if (!property.writable) value = property.type.get_random();
+                        return {'property': property, 'value': value}
                     });
                     this.setState(state => ({ propertiesValues: new_properties }));
                     
@@ -203,6 +205,8 @@ class AddDeviceDialog extends React.Component<AddDeviceDialogProps, AddDeviceDia
                     this.setState(state => ({ propertiesValues: new_propertiesValues }));
             }
         }
+
+        console.log(this.state.propertiesValues);
     }
 
     _handleSaveChanges = async () => {

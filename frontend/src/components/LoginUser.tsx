@@ -6,20 +6,21 @@ import { ReduxType, mapStateToProps, mapDispatcherToProps } from '@/utils/store/
 import axios from 'axios';
 
 import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Alert from '@material-ui/lab/Alert';
+import Button from '@material-ui/core/Button';
+import Link from '@material-ui/core/Link';
 
-import {User, load_user} from '@/classes/User';
+import CloseIcon from '@material-ui/icons/Close';
+
+import Router from '@/utils/endpointAPI';
 
 import '@/general.scss';
 
 // Definition of State
 type LoginUserState = {
-    // General attributes
-    error: string | undefined,
+    newUser: boolean,
     // Specific attributes
+    name: string,
     userID: string | undefined,
     userPassword: string | undefined,
 }
@@ -27,10 +28,11 @@ type LoginUserState = {
 class LoginUser extends React.Component<ReduxType, LoginUserState> {
     constructor(props: ReduxType) {
         super(props);
+
         this.state = {
-            // General attributes
-            error: undefined,
+            newUser: false,
             // Specific attributes
+            name: "",
             userID: undefined,
             userPassword: undefined,
         }
@@ -39,34 +41,28 @@ class LoginUser extends React.Component<ReduxType, LoginUserState> {
     render() {
         return (
             <div>
-                {this.state.error && <Alert
-                    severity="error"
-                    action={
-                        <IconButton
-                        aria-label="close"
-                        color="inherit"
-                        size="small"
-                        onClick={() => {this._closeAlert()}}
-                        >
-                        <CloseIcon fontSize="inherit" />
-                        </IconButton>
-                    }
-                    >
-                    TestError
-                </Alert>}
                 {this.props.user && <Redirect to={"/main-page"} />}
                 <form className='center' noValidate autoComplete="off">
+                    { this.state.newUser && <TextField className="TextField" onChange={this._handleTextFieldChange} required id="name" label="Name" /> }
                     <TextField className="TextField" onChange={this._handleTextFieldChange} required id="userId" label="User ID" />
                     <TextField className="TextField" onChange={this._handleTextFieldChange} id="password" label="Password" type="password"/>
                     <Button className="Button LoginButton"
-                        disabled={!this.state.userID}
+                        disabled={this._handleButtonDisabled()}
                         variant="contained"
                         color="default"
                         size="small"
                         onClick={this._handleSendUser}
                         >
-                        Login
+                        {this.state.newUser ? "Sign In" : "Login"}
                     </Button>
+                    <Link
+                        className="Link"
+                        component="button"
+                        variant="body2"
+                        onClick={this._handleChangeType}
+                    >
+                        {this.state.newUser ? "Login" : "Sign In"}
+                    </Link>
                 </form>
             </div>
         );
@@ -77,6 +73,9 @@ class LoginUser extends React.Component<ReduxType, LoginUserState> {
     _handleTextFieldChange = (e: React.ChangeEvent<{ value: string }>) => {
         if (e.target instanceof Element) {
             switch(e.target.id) {
+                case 'name':
+                    this.setState(state => ({ name: e.target.value == "" ? undefined : e.target.value}));
+                    break;
                 case 'userId':
                     this.setState(state => ({ userID: e.target.value == "" ? undefined : e.target.value}));
                     break;
@@ -88,34 +87,39 @@ class LoginUser extends React.Component<ReduxType, LoginUserState> {
     }
 
     _handleSendUser = async () => {
-        if (this.state.userID != undefined) {
-            getInformation(this.state.userID).then(user => {
+
+        if (this.state.newUser) {
+            if (this.state.name != undefined && this.state.userID != undefined && this.state.userPassword != undefined) {
+                let user = await Router.create_new_user(this.state.name, this.state.userID, this.state.userPassword);
+                if (user == undefined) return;
                 this.props.saveUser(user);
-            }).catch(error => {
-                this._openAlert(error);
-            });
+            }
+
+        } else {
+            if (this.state.userID != undefined && this.state.userPassword != undefined) {
+                Router.load_user(this.state.userID).then(user => {
+                    this.props.saveUser(user);
+                }).catch(error => {
+                    // Nothing for now
+                });
+            }
+        }
+    }
+
+    _handleChangeType = () => {
+        this.setState(state => ({ newUser: !state.newUser }))
+    }
+
+    _handleButtonDisabled = () => {
+        if (this.state.newUser) {
+            return !this.state.name && !this.state.userID && !this.state.userPassword;
+        } else {
+            return !this.state.userID && !this.state.userPassword;
         }
     }
 
     // ============================== HANDLE EVENTS ==============================
-    _openAlert(error_message: string) {
-        this.setState(state => ({ error: error_message }));
-    }
 
-    _closeAlert() {
-        this.setState(state => ({ error: undefined }));
-    }
-    
-}
-
-async function getInformation(userID : string) : Promise<User> {
-    let address : string = "http://localhost:8000/user/" + userID;
-    const response = await axios.get(address);
-
-    if (typeof response.data === "string") {
-        console.log("ERROR");
-        throw new Error();
-    } else return load_user(userID, response.data)
 }
 
 export default connect(mapStateToProps, mapDispatcherToProps) (LoginUser);

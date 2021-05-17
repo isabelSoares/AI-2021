@@ -107,7 +107,7 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                                     <div className="PropertyValue Enumerator">
                                                         <TextField className="PropertyValueInput" onChange={this._handleSelectFieldChange}
                                                             required id="enumeratorValue"label="Value"size="small" name={propertyValue.id}
-                                                            value={propertyValue.value} select
+                                                            value={propertyValue.value} disabled={!propertyValue.property.writable} select
                                                         >
                                                             {propertyValue.property?.type.get_values().map((value) => (
                                                                 <MenuItem id={propertyValue.id} key={value.key} value={value.key}>
@@ -120,7 +120,7 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                                 {propertyValue.property?.type.type == "Scalar" &&
                                                     <div className="PropertyValue Scalar">
                                                         <TextField className="PropertyValueInput" onChange={this._handleTextFieldChange} 
-                                                            required id={propertyValue.id} label="Value" size="small"
+                                                            required id={propertyValue.id} label="Value" size="small" disabled={!propertyValue.property.writable}
                                                             error={this.state.invalid_inputs.includes(propertyValue.id)}
                                                             defaultValue={propertyValue.value}/>
                                                         <p className="PropertyUnits">{propertyValue.property?.type.get_units()}</p>

@@ -108,6 +108,9 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             width: 100%;
 
             .options {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
 
                 .SelectionButton {
                     margin: 1% 1% 1% 1%;
@@ -116,6 +119,7 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
         
                 .OptionDevice {
                     width: 175px;
+                    margin: 1% 1% 1% 1%;
                     padding: 10px 10px 10px 10px;
                     box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
                     border-radius: 10px;
@@ -617,6 +621,10 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             color: white;
         }
     }
+}
+
+.Link {
+    color: $accent-color;
 }
 
 p {

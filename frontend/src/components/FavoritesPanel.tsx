@@ -47,21 +47,23 @@ class FavoritesPanel extends React.Component<ReduxType, DevicesPanelState> {
                             <p> Favorite Devices </p>
                         </div>
                         <div className="content">
-                            <div className="options">
-                                {this.props.user.favorites.map((device, index) => {
-                                    return (
-                                        <Box className="OptionDevice" key={device.id} onClick={() => this._handleClickDevice(device.id)}>
-                                            <div className="OptionDeviceHeader">
-                                                <p className="DeviceName"> {device.name} </p>
-                                                <p className="DeviceType">
-                                                    {device.deviceType != undefined ? device.deviceType.name : "Unknown"}
-                                                </p>
-                                            </div>
-                                            {device.favorite && <Favorite className="FavoriteIcon"/>}
-                                            {!device.favorite && <FavoriteBorder className="NonFavoriteIcon"/>}
-                                        </Box>
-                                    )
-                                })}
+                            <div className="main-content">
+                                <div className="options">
+                                    {this.props.user.favorites.map((device, index) => {
+                                        return (
+                                            <Box className="OptionDevice" key={device.id} onClick={() => this._handleClickDevice(device.id)}>
+                                                <div className="OptionDeviceHeader">
+                                                    <p className="DeviceName"> {device.name} </p>
+                                                    <p className="DeviceType">
+                                                        {device.deviceType != undefined ? device.deviceType.name : "Unknown"}
+                                                    </p>
+                                                </div>
+                                                {device.favorite && <Favorite className="FavoriteIcon"/>}
+                                                {!device.favorite && <FavoriteBorder className="NonFavoriteIcon"/>}
+                                            </Box>
+                                        )
+                                    })}
+                                </div>
                             </div>
                         </div>
                     </div>

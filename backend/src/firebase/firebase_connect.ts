@@ -32,3 +32,9 @@ export async function create_document(collection : string, data: any) : Promise<
     await reference.set(data);
     return reference;
 }
+
+export async function create_document_with_id(collection : string, id : string, data: any) : Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+    let reference = await db.collection(collection).doc(id);
+    await reference.set(data);
+    return reference;
+}

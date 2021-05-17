@@ -196,6 +196,17 @@ app.post('/device/', (req, res) => {
     })
 });
 
+app.post('/user/', (req, res) => {
+
+    let name : string = req.body['name'];
+    let user_id : string = req.body['id'];
+
+    utils.add_new_user(name, user_id).then(data => {
+        if (data == undefined) res.send("ERROR: Device not created");
+        else res.send(JSON.stringify({'id': data.id, 'object': load_user(data.data)}));
+    })
+});
+
 // ============================ FAVORITES ============================
 
 app.get('/favorites/:user_id', async (req, res) => {

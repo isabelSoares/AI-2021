@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { get_reference, get_document, create_document} from './firebase/firebase_connect';
+import { get_reference, get_document, create_document, create_document_with_id } from './firebase/firebase_connect';
 
 // Classes
 import { load_user } from './classes/User';
@@ -107,6 +107,16 @@ export async function change_property_value(propertyValue_id: string, value: num
     deviceReference.update({ 'propertyValues': newDeviceProperties, 'valuesHistory': deviceValuesHistory });
 
     return newPropertyValueReference.id;
+}
+
+export async function add_new_user(name: string, user_id: string) : Promise<FirebaseFirestore.DocumentData | undefined> {
+
+    let userDataToSave = { 'name': name, 'houses': [] };
+    let userReference = await create_document_with_id('users', user_id, userDataToSave);
+    let userDocument = await userReference.get();
+    let userData = userDocument.data();
+
+    return { 'id': user_id, 'data': userData };
 }
 
 export async function add_new_house(name: string, user_id: string) : Promise<FirebaseFirestore.DocumentData | undefined> {
