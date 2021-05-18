@@ -8,3 +8,7 @@ export function saveUser(user: User) {
         user
     });
 }
+
+export function logoutUser() {
+    return action(Constants.LOGOUT_USER, {});
+}

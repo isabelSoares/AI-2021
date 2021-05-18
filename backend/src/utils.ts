@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { get_reference, get_document, create_document, create_document_with_id } from './firebase/firebase_connect';
+import { get_reference, get_document, create_document, create_document_with_id, get_user_from_email } from './firebase/firebase_connect';
 
 // Classes
 import { load_user } from './classes/User';
@@ -111,7 +111,7 @@ export async function change_property_value(propertyValue_id: string, value: num
 
 export async function add_new_user(name: string, user_id: string) : Promise<FirebaseFirestore.DocumentData | undefined> {
 
-    let userDataToSave = { 'name': name, 'houses': [] };
+    let userDataToSave = { 'name': name, 'houses': [], 'preferences': [] };
     let userReference = await create_document_with_id('users', user_id, userDataToSave);
     let userDocument = await userReference.get();
     let userData = userDocument.data();
@@ -266,4 +266,40 @@ export async function add_new_device(name: string, division_id: string, deviceTy
     await divisionReference.update({ 'devices': division_devices });
 
     return { 'id': deviceReference.id, 'data': deviceData };
+}
+
+export async function add_house_to_user(house_id: string, user_email: string) : Promise<FirebaseFirestore.DocumentData | undefined> {
+
+    // Get User Id
+    let user = await get_user_from_email(user_email);
+    let user_id = user.uid;
+
+    // Get House Reference
+    let houseReference = await get_reference('houses', house_id);
+    let houseDocument = await houseReference.get();
+    let houseData = houseDocument.data();
+    // Get User Reference
+    let userReference = await get_reference('users', user_id);
+    let userDocument = await userReference.get();
+    let userData = userDocument.data();
+
+    if (houseData == undefined || userData == undefined) return undefined;
+
+    // Update House
+    let house_users = houseData['users'];
+    let alreadyAddedUser = house_users.some((user : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => userReference.isEqual(user))
+    if (!alreadyAddedUser) {
+        house_users.push(userReference);
+        await houseReference.update({ 'users': house_users });
+    }
+
+    // Update User
+    let user_houses = userData['houses'];
+    let alreadyAddedHouse = user_houses.some((house : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => houseReference.isEqual(house))
+    if (!alreadyAddedHouse) {
+        user_houses.push(houseReference);
+        await userReference.update({ 'houses': user_houses });
+    }
+
+    return houseData;
 }

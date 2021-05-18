@@ -205,8 +205,6 @@ class AddDeviceDialog extends React.Component<AddDeviceDialogProps, AddDeviceDia
                     this.setState(state => ({ propertiesValues: new_propertiesValues }));
             }
         }
-
-        console.log(this.state.propertiesValues);
     }
 
     _handleSaveChanges = async () => {

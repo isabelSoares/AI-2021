@@ -64,6 +64,16 @@ app.get('/house/:house_id', (req, res) => {
     });
 });
 
+app.post('/house/:house_id/user/', (req, res) => {
+
+    let house_id = req.params['house_id'];
+    let user_email = req.body['user_email'];
+    utils.add_house_to_user(house_id, user_email).then((data) => {
+        if (data == undefined) res.send("ERROR: House not added to user");
+        else res.send(JSON.stringify(load_house(data)));
+    });
+});
+
 app.get('/floor/:floor_id', (req, res) => {
 
     let floor_id = req.params['floor_id'];

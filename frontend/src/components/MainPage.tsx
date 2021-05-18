@@ -25,6 +25,8 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import InfoPanel from "@/components/InfoPanel";
 import DevicesPanel from "@/components/DevicesPanel";
 import FavoritesPanel from "@/components/FavoritesPanel";
+import SchedulesPanel from "@/components/SchedulesPanel";
+import SettingsPanel from "@/components/SettingsPanel";
 
 import '@/general.scss';
 
@@ -128,6 +130,8 @@ class MainPage extends React.Component<ReduxType, MainPageState> {
                     {this.state.selectedOption.key == "DivisionSelection" && <InfoPanel />}
                     {this.state.selectedOption.key == "Devices" && <DevicesPanel />}
                     {this.state.selectedOption.key == "Favorites" && <FavoritesPanel />}
+                    {this.state.selectedOption.key == "ScheduledEvents" && <SchedulesPanel />}
+                    {this.state.selectedOption.key == "Settings" && <SettingsPanel />}
                 </main>
             </div>
         )

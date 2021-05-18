@@ -1,11 +1,21 @@
 import * as admin from 'firebase-admin';
+import 'firebase/auth';
 
 // Load Firebase Database Keys
 var serviceAccount = require("../../keys/firebase.json");
 
-admin.initializeApp({
+// ====================== INITIALIZE FIREBASE ======================
+var firebaseConfig = {
+    apiKey: "AIzaSyCK1LsPeN6-muuM4HZbqM5tuFS_KljMPa4",
+    authDomain: "smarthome-7298f.firebaseapp.com",
+    projectId: "smarthome-7298f",
+    storageBucket: "smarthome-7298f.appspot.com",
+    messagingSenderId: "1009618421285",
+    appId: "1:1009618421285:web:96e14fb61688964785a1cc",
+    measurementId: "G-TN83768QQX",
     credential: admin.credential.cert(serviceAccount)
-});
+};
+admin.initializeApp(firebaseConfig);
 
 const db = admin.firestore();
 
@@ -37,4 +47,9 @@ export async function create_document_with_id(collection : string, id : string, 
     let reference = await db.collection(collection).doc(id);
     await reference.set(data);
     return reference;
+}
+
+export async function get_user_from_email(user_email : string) : Promise<admin.auth.UserRecord> {
+    let user = await admin.auth().getUserByEmail(user_email);
+    return user;
 }

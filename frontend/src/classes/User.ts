@@ -2,14 +2,17 @@ import { House } from '@/classes/House';
 import { Floor } from '@/classes/Floor';
 import { Division } from '@/classes/Division';
 import { Device } from '@/classes/Device';
+import { Preference } from '@/classes/Preference';
 
 import Router from '@/utils/endpointAPI';
 
 export class User {
     id: string;
     name: string;
+    paths_preferences: string[];
     paths_houses: string[];
     // To Be Loaded
+    preferences: Preference[] | undefined;
     houses: House[] | undefined;
     floors: Floor[] | undefined;
     divisions: Division[] | undefined;
@@ -26,12 +29,14 @@ export class User {
     division_selected: Division | undefined;
     paths_devices: string[] | undefined;
 
-    constructor(id: string, name: string, paths_houses: string[]) {
+    constructor(id: string, name: string, paths_preferences: string[], paths_houses: string[]) {
         this.id = id;
         this.name = name;
+        this.paths_preferences = paths_preferences;
         this.paths_houses = paths_houses;
         
         // To Be Loaded
+        this.preferences = undefined;
         this.houses = undefined;
         this.floors = undefined;
         this.divisions = undefined;
@@ -51,6 +56,17 @@ export class User {
     }
 
     // ==================== LOAD OBJECTS ====================
+
+    async load_preferences() {
+        this.preferences = [];
+        
+        await Promise.all(this.paths_preferences.map(async (path_to_preference) => {
+            let preference_id = path_to_preference.replace("preferences/", "");
+            let preference = await Router.load_preference(preference_id);
+
+            this.preferences?.push(preference);
+        }));
+    }
 
     async load_houses() {
         this.houses = [];
@@ -154,28 +170,44 @@ export class User {
     async add_new_house(house_data : {'name': string}) {
         let newHouse = await Router.create_new_house(this.id, house_data);
         this.houses?.push(newHouse);
+
+        // Add to path correspondent
+        let pathHouse = "houses/" + newHouse.id;
+        this.paths_houses.push(pathHouse);
     }
     async add_new_floor(floor_data : {'name': string}) {
         if (this.house_id_selected == undefined) return;
         let newFloor = await Router.create_new_floor(this.house_id_selected, floor_data);
         this.floors?.push(newFloor);
+
+        // Add to path correspondent
+        let pathFloor = "floors/" + newFloor.id;
+        this.house_selected?.paths_floors.push(pathFloor);
     }
 
     async add_new_division(division_data : {'name': string}) {
         if (this.floor_id_selected == undefined) return;
         let newDivision = await Router.create_new_division(this.floor_id_selected, division_data);
         this.divisions?.push(newDivision);
+
+        // Add to path correspondent
+        let pathDivision = "divisions/" + newDivision.id;
+        this.floor_selected?.paths_divisions.push(pathDivision);
     }
     
     async add_new_device(device_data : {'name': string, 'favorite': boolean, 'deviceType_id': string, 'propertyValues': {'property_id': string, 'value': number }[]}) {
         if (this.division_id_selected == undefined) return;
         let newDevice = await Router.create_new_device(this.division_id_selected, device_data);
         this.devices?.push(newDevice);
+
+        // Add to path correspondent
+        let pathDevice = "devices/" + newDevice.id;
+        this.division_selected?.paths_devices.push(pathDevice);
     }
 }
 
-export function load_user(id: string, data : {name: string, paths_houses: string[]}) : User {
-    let new_user = new User(id, data.name, data.paths_houses);
+export function load_user(id: string, data : {name: string, paths_preferences: string[], paths_houses: string[]}) : User {
+    let new_user = new User(id, data.name, data.paths_preferences, data.paths_houses);
     
     return new_user;
 }

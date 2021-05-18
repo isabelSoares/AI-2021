@@ -1,12 +1,26 @@
 import axios, {AxiosResponse} from 'axios';
 
-import firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+// ====================== INITIALIZE FIREBASE ======================
+var firebaseConfig = {
+    apiKey: "AIzaSyCK1LsPeN6-muuM4HZbqM5tuFS_KljMPa4",
+    authDomain: "smarthome-7298f.firebaseapp.com",
+    projectId: "smarthome-7298f",
+    storageBucket: "smarthome-7298f.appspot.com",
+    messagingSenderId: "1009618421285",
+    appId: "1:1009618421285:web:df2d9be6f7fbfe0985a1cc",
+    measurementId: "G-MR04N6WKBB"
+};
+firebase.initializeApp(firebaseConfig);
 
 import { PropertyValue, load_propertyValue } from '@/classes/PropertyValue';
 import { ValueHistory, load_valueHistory } from '@/classes/ValueHistory';
 import { DeviceType, load_deviceType } from '@/classes/DeviceType';
+import { Preference, load_preference } from '@/classes/Preference';
 import { Property, load_property } from '@/classes/Property';
 import { Division, load_division } from '@/classes/Division';
+import { Schedule, load_schedule } from '@/classes/Schedule';
 import { Device, load_device } from '@/classes/Device';
 import { Floor, load_floor } from '@/classes/Floor';
 import { House, load_house } from '@/classes/House';
@@ -34,9 +48,19 @@ class RouterAPI {
     
     // ================ SPECIFIC REQUESTS : LOADS  ================
 
-    async load_user(user_id: string) : Promise<User> {
+    async load_user(user_email: string, user_password: string) : Promise<User | undefined> {
+
+        // Register New User
+        let user = await firebase.auth().signInWithEmailAndPassword(user_email, user_password).then((userCredential) => {
+            return userCredential.user;
+        }).catch((error) => {
+            console.log(error);
+            return null;
+        });
+        if (user == null) return undefined;
+
+        let user_id = user.uid;
         let address : string = this.domain + "user/" + user_id;
-        const response = await axios.get(address);
 
         return new Promise<User>((resolve, reject) => {
             this.get(address).then(response => {
@@ -82,6 +106,32 @@ class RouterAPI {
         });
     }
     
+    async load_preference(preference_id : string) : Promise<Preference> {
+        let address : string = this.domain + "preference/" + preference_id;
+
+        return new Promise<Preference>((resolve, reject) => {
+            this.get(address).then(response => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject();
+                } else resolve(load_preference(preference_id, response.data));
+            });
+        });
+    }
+
+    async load_schedule(schedule_id : string) : Promise<Schedule> {
+        let address : string = this.domain + "schedule/" + schedule_id;
+
+        return new Promise<Schedule>((resolve, reject) => {
+            this.get(address).then(response => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject();
+                } else resolve(load_schedule(schedule_id, response.data));
+            });
+        });
+    }
+
     async load_house(house_id : string) : Promise<House> {
         let address : string = this.domain + "house/" + house_id;
 
@@ -326,6 +376,34 @@ class RouterAPI {
                 }
             });
         });
+    }
+
+    async add_house_to_user(house_id: string, user_email: string) : Promise<House> {
+        let address : string = this.domain + "house/" + house_id + "/user";
+        let body = { 'user_email': user_email };
+
+        return new Promise<House>((resolve, reject) => {
+            this.post(address, body).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else resolve(load_house(house_id, response.data));
+            });
+        });
+    }
+
+    // ================ SPECIFIC REQUESTS : GET LOGGED USER & LOGOUT  ================
+
+    get_user_logged_in() : firebase.User | undefined {
+        let user = firebase.auth().currentUser;
+        if (user == null) return undefined;
+        else return user;
+    }
+
+    async logout() : Promise<void> {
+        // Register New User
+        await firebase.auth().signOut()
+        return;
     }
 }
 
