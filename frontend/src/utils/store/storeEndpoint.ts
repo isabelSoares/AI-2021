@@ -14,7 +14,8 @@ export const mapStateToProps = ({ user_reducer }: IRootState) => {
 
 export const mapDispatcherToProps = (dispatch: Dispatch<UserActions>) => {
     return {
-        saveUser: (user: User) => dispatch(actions.saveUser(user))
+        saveUser: (user: User) => dispatch(actions.saveUser(user)),
+        logoutUser: () => dispatch(actions.logoutUser())
     }
 }
 

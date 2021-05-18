@@ -3,6 +3,7 @@ $background-color: rgba(225, 247, 226, 1);
 $accent-color: rgba(21, 77, 24, 1);
 
 $button-color: rgba(23, 115, 28, 1);
+$button-red: rgba(139, 0, 0, 1);
 $button-unselected-color: rgba(230, 230, 230, 1);
 $button-hover-color: rgba(210, 210, 210, 1);
 
@@ -290,7 +291,6 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
     flex-direction: column;
     font-family: Arial;
     width: 500px;
-    height: 600px;
     margin: 0px 0px 0px 0px;
     background-color: white;
     padding: 15px 15px 15px 15px;
@@ -425,6 +425,14 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             }
         }
     }
+
+    .Graph {
+        p {
+            text-align: center;
+            font-weight: bold;
+            color: $accent-color;
+        }
+    }
 }
 
 .recharts-responsive-container {
@@ -444,7 +452,6 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
     flex-direction: column;
     font-family: Arial;
     width: 500px;
-    height: 200px;
     margin: 0px 0px 0px 0px;
     background-color: white;
     padding: 15px 15px 15px 15px;
@@ -623,7 +630,273 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
     }
 }
 
-.Link {
+.PreferenceDialog {
+    display: flex;
+    flex-direction: column;
+    font-family: Arial;
+    width: 500px;
+    height: auto;
+    margin: 0px 0px 0px 0px;
+    background-color: white;
+    padding: 15px 15px 15px 15px;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
+    border-top: 5px solid $accent-color;
+
+    .PreferenceHeader {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 5px 10px 10px 10px;
+
+        .ComponentName {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            font-weight: bold;
+            font-size: large;
+        }
+    }
+
+    .PreferenceContent {
+        display: flex;
+        flex-direction: column;
+        margin-top: 10px;
+        margin-bottom: 15px;
+
+        .Line1 {
+            width: 100%;
+        }
+
+        .Line {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .PreferenceInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+            color: green;
+        }
+        
+        .PreferenceInput .MuiInput-underline:not(.Mui-error):after {
+            border-bottom-color: $button-color;
+        }
+    }
+
+    .PreferenceProperties {
+        margin-top: 10px;
+        margin-bottom: 5px;
+
+        .Property {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+
+            .PropertyHeader {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+
+                
+                .PropertyName {
+                    margin-right: 10px;
+                    margin-bottom: 0px;
+                    margin-top: 8px;
+                    font-weight: bold;
+                    font-size: 15px;
+                }
+                
+                .PropertyType{
+                    font-size: small;
+                }
+
+            }
+            
+            .PropertyValue {
+                margin-bottom: 0px;
+                margin-top: 8px;
+                font-size: 15px;
+
+                .PropertyValueInput{
+                    width: 100px;
+                }
+
+                .PropertyValueInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                    color: green;
+                }
+                
+                .PropertyValueInput .MuiInput-underline:not(.Mui-error):after {
+                    border-bottom-color: $button-color;
+                }
+            }
+
+            .PropertyValue.Scalar{
+                display: flex;
+                flex-direction: row;
+            }
+            
+        }
+    }
+
+    .Schedules {
+        margin-top: 15px;
+        margin-bottom: 15px;
+
+        .PreferenceInput {
+            width: 100%;
+        }
+       
+        .PreferenceInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+            color: green;
+        }
+        
+        .PreferenceInput .MuiInput-underline:not(.Mui-error):after {
+            border-bottom-color: $button-color;
+        }
+    }
+
+    .MuiDivider-root {
+        margin: 0px;
+    }
+
+    .Buttons {
+        margin: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+
+        .Button:not(.Mui-disabled) {
+            color: white;
+        }
+
+        .Button.AcceptButton {
+            background-color: $button-color;
+        }
+        
+        .Button.RejectButton {
+            background-color: $button-red;
+        }
+
+        .Button.ApplyButton {
+            width: 99%;
+            background-color: $accent-color;
+        }
+    }
+}
+
+.SettingsPanel {
+    margin: 5% 5% 5% 5%;
+    background-color: white;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.25);
+    padding: 0%;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .Title {
+        padding: 1% 1% 1% 2%;
+        background-color: $accent-color;
+
+        p {
+            font-size: larger;
+            margin: 0%;
+            color: white;
+        }
+    }
+
+    .content {
+        padding: 40px 40px 40px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: left;
+
+        .Info {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            width: 100%;
+            margin-bottom: 1%;
+
+            .MuiAvatar-root {
+                width: 10vw;
+                height: 10vw;
+            }
+
+            .MainInfo {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                margin-left: 5%;
+                width: 100%;
+
+                .ValueInput {
+                    width: 100%;
+                }
+
+                .ValueInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                    color: green;
+                }
+                
+                .ValueInput .MuiInput-underline:not(.Mui-error):after {
+                    border-bottom-color: $button-color;
+                }
+            }
+        }
+
+        .AddUserToHouse {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+
+            .AddUserToHouseForm {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                margin-bottom: 3%;
+
+                .ValueInput {
+                    width: 49%;
+                }
+
+                .ValueInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                    color: green;
+                }
+                
+                .ValueInput .MuiInput-underline:not(.Mui-error):after {
+                    border-bottom-color: $button-color;
+                }
+            }
+
+            .Button {
+                width: 100%;
+            }
+
+            .Button.AddUserButton:not(.Mui-disabled) {
+                background-color: $button-color;
+                color: white;
+            }
+        }
+
+        .Buttons {
+
+            .Button {
+                width: 100%;
+            }
+
+            .Button.LogoutButton:not(.Mui-disabled) {
+                background-color: $button-color;
+                color: white;
+            }
+        }
+
+        .MuiDivider-root {
+            margin: 3% 0%;
+        }
+
+    }
+}
+
+.MuiTypography-colorPrimary.Link {
     color: $accent-color;
 }
 

@@ -152,20 +152,23 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                             </AccordionSummary>
                             <AccordionDetails>
                                 { this.state.data != undefined &&
-                                    <ResponsiveContainer>
-                                        <LineChart data={this.state.data} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="key" />
-                                            <YAxis allowDecimals={false} />
-                                            <Tooltip />
-                                            <Legend />
-                                            { graphLines.map((line) => {
-                                                return (
-                                                    <Line key={line['weekday']} type="monotone" dataKey={line['weekday']} stroke={line['color']} />
-                                                )
-                                            })}
-                                        </LineChart>
-                                    </ResponsiveContainer>
+                                    <div className="Graph">
+                                        <p className="GraphTitle"> Hourly Changes in Device </p>
+                                        <ResponsiveContainer>
+                                            <LineChart data={this.state.data} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="key" />
+                                                <YAxis allowDecimals={false} />
+                                                <Tooltip />
+                                                <Legend />
+                                                { graphLines.map((line) => {
+                                                    return (
+                                                        <Line key={line['weekday']} type="monotone" dataKey={line['weekday']} stroke={line['color']} />
+                                                    )
+                                                })}
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 }
                             </AccordionDetails>
                         </Accordion>

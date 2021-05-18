@@ -10,6 +10,8 @@ export function userReducer(state: IUserState = initialization, action: UserActi
     switch (action.type) {
         case Constants.SAVE_USER:
             return { user: action.payload.user };
+        case Constants.LOGOUT_USER:
+            return { user: undefined }
         default:
             return state;
     }
