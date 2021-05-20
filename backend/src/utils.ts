@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { get_reference, get_document, create_document, create_document_with_id, get_user_from_email } from './firebase/firebase_connect';
+import { get_reference, get_document, create_document, create_document_with_id, get_user_from_email, change_document } from './firebase/firebase_connect';
 
 // Classes
 import { load_user } from './classes/User';
@@ -13,6 +13,7 @@ import { load_propertyValue } from './classes/PropertyValue';
 import { load_schedule } from './classes/Schedule';
 import { load_preference } from './classes/Preference';
 import { load_valueHistory } from './classes/ValueHistory';
+import firebase from 'firebase';
 
 // Get Favorite Devices
 export async function get_favorite_devices(user_id: string) : Promise<{'id': string, 'device': Device}[]> {
@@ -302,4 +303,71 @@ export async function add_house_to_user(house_id: string, user_email: string) : 
     }
 
     return houseData;
+}
+
+export async function reject_preference(preference_id: string) : Promise<void> {
+
+    // Get preference reference
+    let preferenceReference = await get_reference('preferences', preference_id);
+    let preferenceDocument = await preferenceReference.get();
+    let preferenceData = preferenceDocument.data();
+    if (preferenceData == undefined) return;
+
+    // Get User Reference
+    let userReference = preferenceData['user'];
+    let userDocument = await userReference.get();
+    let userData = userDocument.data();
+    
+    // Remove preference from user
+    let userPreferences = userData['preferences'];
+    let newUserPreferences = userPreferences.filter((ref: any) => !ref.isEqual(preferenceReference));
+    userReference.update({ 'preferences': newUserPreferences });
+
+    // Delete Preference
+    preferenceReference.delete();
+
+    return;
+}
+
+export async function update_preference(preference_id: string, data: any) : Promise<FirebaseFirestore.DocumentData | undefined> {
+
+    let updated_info : any = {};
+
+    // Check if name needs to be updated
+    if ('name' in data) updated_info['name'] = data['name'];
+
+    // Do Property Values new association
+    if ('properties' in data) {
+        let properties : {'device': string, 'property': string, 'value': number}[] = data['properties'];
+        let properties_to_add : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>[] = [];
+
+        await Promise.all(properties.map( async (property) => {
+            
+            let deviceReference = await get_reference('devices', property.device);
+            let propertyReference = await get_reference('properties', property.property);
+            let propertyValueData = { 'device': deviceReference, 'property': propertyReference, 'value': property.value };
+            let propertyValueReference = await create_document('propertyValues', propertyValueData);
+            properties_to_add.push(propertyValueReference);
+        }));
+
+        updated_info['propertyValues'] = properties_to_add;
+    }
+
+    // Do Schedules new association
+    if ('schedules' in data) {
+        let schedules : { 'timestamp': string }[] = data['schedules'];
+        let schedules_to_add : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>[] = [];
+
+        await Promise.all(schedules.map( async (schedule) => {
+            let date = new Date(schedule.timestamp);
+            let scheduleReference = await create_document('schedules', {'timestamp': admin.firestore.Timestamp.fromDate(date)})
+            schedules_to_add.push(scheduleReference);
+        }));
+
+        updated_info['schedules'] = schedules_to_add;
+    }
+
+    await change_document('preferences', preference_id, updated_info);
+    let newData = await get_document('preferences', preference_id);
+    return newData;
 }

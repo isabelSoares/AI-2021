@@ -432,6 +432,29 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             font-weight: bold;
             color: $accent-color;
         }
+
+        .GraphContainer {
+            margin-bottom: 25px;
+        }
+
+        .PropertySelection {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+
+            .ValueInput{
+                min-width: 170px;
+                width: auto;
+            }
+
+            .ValueInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                color: green;
+            }
+            
+            .ValueInput .MuiInput-underline:not(.Mui-error):after {
+                border-bottom-color: $button-color;
+            }
+        }
     }
 }
 
@@ -445,6 +468,11 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
     max-height: 225px;
     min-height: 225px;
     background-color: $background-color;
+
+    .recharts-legend-wrapper {
+        bottom: -25px !important;
+        left: 35px !important;
+    }
 }
 
 .AddComponentDialog {
@@ -691,41 +719,21 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-
-            .PropertyHeader {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-
-                
-                .PropertyName {
-                    margin-right: 10px;
-                    margin-bottom: 0px;
-                    margin-top: 8px;
-                    font-weight: bold;
-                    font-size: 15px;
-                }
-                
-                .PropertyType{
-                    font-size: small;
-                }
-
-            }
             
-            .PropertyValue {
+            .PropertyComponent {
                 margin-bottom: 0px;
                 margin-top: 8px;
                 font-size: 15px;
 
-                .PropertyValueInput{
-                    width: 100px;
+                .PropertyInput{
+                    width: 90%;
                 }
 
-                .PropertyValueInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                .PropertyInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
                     color: green;
                 }
                 
-                .PropertyValueInput .MuiInput-underline:not(.Mui-error):after {
+                .PropertyInput .MuiInput-underline:not(.Mui-error):after {
                     border-bottom-color: $button-color;
                 }
             }
@@ -736,22 +744,71 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             }
             
         }
+
+        .ButtonsGroup {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+
+        .MuiIconButton-root {
+            padding: 5px 5px 5px 5px;
+
+            .Icon {
+                fill: $accent-color;
+            }
+        }
     }
 
     .Schedules {
         margin-top: 15px;
         margin-bottom: 15px;
 
-        .PreferenceInput {
-            width: 100%;
+        .Schedule {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+
+            .PreferenceInput {
+                width: 100%;
+            }
+           
+            .PreferenceInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                color: green;
+            }
+            
+            .PreferenceInput .MuiInput-underline:not(.Mui-error):after {
+                border-bottom-color: $button-color;
+            }
+
+            .MuiFormControl-root {
+                width: 100%;
+
+                .MuiFormLabel-root {
+                    width: 90%;
+                }
+    
+                .MuiInputBase-root {
+                    width: 90%;
+                }
+            }
+
         }
-       
-        .PreferenceInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
-            color: green;
+
+        .ButtonsGroup {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
         }
-        
-        .PreferenceInput .MuiInput-underline:not(.Mui-error):after {
-            border-bottom-color: $button-color;
+
+        .MuiIconButton-root {
+            padding: 5px 5px 5px 5px;
+
+            .Icon {
+                fill: $accent-color;
+            }
         }
     }
 
@@ -815,7 +872,7 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             flex-direction: row;
             justify-content: left;
             width: 100%;
-            margin-bottom: 1%;
+            margin-bottom: 5%;
 
             .MuiAvatar-root {
                 width: 10vw;
@@ -898,6 +955,11 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
 
 .MuiTypography-colorPrimary.Link {
     color: $accent-color;
+}
+
+.MuiDivider-root {
+    background-color: $accent-color !important;
+    height: 2px !important;
 }
 
 p {

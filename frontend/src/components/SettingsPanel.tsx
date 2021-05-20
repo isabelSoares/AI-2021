@@ -7,7 +7,6 @@ import User from 'firebase';
 
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
-import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 
@@ -56,7 +55,21 @@ class SettingsPanel extends React.Component<ReduxType, SettingsPanelState> {
                                     defaultValue={this.state.firebase_user?.email}/>
                             </div>
                         </div>
-                        <Divider />
+                        <div className="Buttons">
+                            {!this.props.user && <Redirect to={"/"} />}
+                            <Button className="Button LogoutButton"
+                                variant="contained" color="default" size="small"
+                                onClick={this._handleClickLogout}>
+                                    Logout
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+                <div className="SettingsPanel">
+                    <div className="Title">
+                        <p> Add User to House </p>
+                    </div>
+                    <div className="content">
                         <div className="AddUserToHouse">
                             <div className="AddUserToHouseForm">
                                 <TextField className="ValueInput" onChange={this._handleSelectFieldChange} 
@@ -76,15 +89,6 @@ class SettingsPanel extends React.Component<ReduxType, SettingsPanelState> {
                                 variant="contained" color="default" size="small"
                                 onClick={this._handleClickAddUser} disabled={this._checkAddUserToHouseDisabled()}>
                                     Add User
-                            </Button>
-                        </div>
-                        <Divider />
-                        <div className="Buttons">
-                            {!this.props.user && <Redirect to={"/"} />}
-                            <Button className="Button LogoutButton"
-                                variant="contained" color="default" size="small"
-                                onClick={this._handleClickLogout}>
-                                    Logout
                             </Button>
                         </div>
                     </div>

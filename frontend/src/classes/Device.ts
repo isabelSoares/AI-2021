@@ -121,7 +121,7 @@ export class Device {
 
     // ==================== OTHER UTILS ====================
 
-    get_graph_data() : any[] | undefined {
+    async get_graph_data() : Promise<any> {
         if (this.valuesHistory == undefined) return undefined;
 
         const hours_by_division = 2;
@@ -131,56 +131,74 @@ export class Device {
 
         // First filter values for the last 7 days (inclusive)
         let historyThisWeek = this.valuesHistory.filter(history => now.diff(history.timestamp, 'days') < 7);
+        await Promise.all(historyThisWeek.map(async (element) => {
+            await element.load_propertyValue();
+            await element.propertyValue?.load_property();
+        }));
 
-        // Divide by days
-        let binnedByDate : any = {};
-        weekDays.forEach(weekDay => binnedByDate[weekDay] = []);
-
-        historyThisWeek.forEach((history) => {
-            // Get Day Information
-            let dayOfTheWeek = history.timestamp.day();
-            let weekDayName = weekDays[dayOfTheWeek];
-            // Save back
-            binnedByDate[weekDayName].push(history);
+        // Divide by property
+        let binnedByPropperty : any = {}
+        historyThisWeek.forEach(element => {
+            let propertyId = element.propertyValue?.property?.id;
+            if (propertyId == undefined) return;
+            
+            if (!(propertyId in binnedByPropperty)) binnedByPropperty[propertyId] = [];
+            binnedByPropperty[propertyId].push(element);
         });
 
-        // Divide by segments of day
-        let binnedByHour : any = {};
-        for (let hour = 0; hour < 24; hour += hours_by_division) {
-            let histories : any = {};
-            weekDays.forEach((weekday) => histories[weekday] = []);
+        
+    
+        let binnedByWeekdayHour : any = {};
+        
+        for (let propertyId in binnedByPropperty) {
+            let startDate = moment().subtract(6, 'days').hour(0).minute(0).second(0);
+            let endDate = moment().add(1, 'days').hour(0).minute(0).second(0);
+            let currentDate = moment(startDate);
 
-            binnedByHour[hour] = {'key': hour, 'histories': histories};
+            binnedByWeekdayHour[propertyId] = {}; 
+
+            let histories : ValueHistory[] = binnedByPropperty[propertyId];
+            let current_index = -1;
+            let current_value = 0;
+            while (currentDate.isBefore(endDate)) {
+    
+                let weekDay = weekDays[currentDate.day()];
+                let hour = currentDate.hour();
+    
+                if (!(weekDay in binnedByWeekdayHour[propertyId])) binnedByWeekdayHour[propertyId][weekDay] = {}
+                if (!(hour in binnedByWeekdayHour[propertyId][weekDay])) binnedByWeekdayHour[propertyId][weekDay][hour] = {}
+    
+                while (current_index + 1 < histories.length && currentDate.isAfter(histories[current_index + 1].timestamp)) {
+                    current_index = current_index + 1;
+                    let value_stored = histories[current_index].propertyValue?.value;
+                    if (value_stored != undefined) current_value = value_stored;
+                }
+                
+                binnedByWeekdayHour[propertyId][weekDay][hour] = current_value;
+    
+                // Update date counter
+                currentDate.add(hours_by_division, 'hours');
+            }
         }
-
-        weekDays.forEach((weekDay) => {
-            let histories = binnedByDate[weekDay];
-            histories.forEach((history : ValueHistory) => {
-                // Get hour and translate it to division
-                let hour = history.timestamp.hour();
-                let hour_converted = Math.floor(hour / hours_by_division) * hours_by_division;
-                // Add it to histories
-                binnedByHour[hour_converted].histories[weekDay].push(history);
-            });
-        });
-
-        // Count number of values in each day
-        for (let hour = 0; hour < 24; hour += hours_by_division) {
-            weekDays.forEach((weekday) => {
-                binnedByHour[hour][weekday] = binnedByHour[hour].histories[weekday].length;
-            });
-            delete(binnedByHour[hour].histories);
-        }
-
+        
+        console.table(binnedByWeekdayHour);
         // Convert to propper data format
-        let data : any[] = [];
-        for (let hour = 0; hour < 24; hour += hours_by_division) {
-            data.push(binnedByHour[hour]);
+        let data : any = {};
+        for (let propertyId in binnedByWeekdayHour) {
+            data[propertyId] = []
+
+            for (let hour = 0; hour < 24; hour = hour + hours_by_division) {
+                let new_object : any = { 'name': hour }
+                weekDays.forEach(weekday => new_object[weekday] = binnedByWeekdayHour[propertyId][weekday][hour]);
+
+                data[propertyId].push(new_object);
+            }
         }
+
+        console.table(data);
 
         return data;
     }
-
 }
 
 export async function load_device(id: string, data : {name: string, favorite: boolean, path_deviceType: string, paths_propertyValues: string[], paths_valuesHistory: string[]}) : Promise<Device> {

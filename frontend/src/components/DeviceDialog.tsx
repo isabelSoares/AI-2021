@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
+import { ResponsiveContainer, LineChart, Label, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
 
 import clone from 'clone';
 import underscore from 'underscore';
@@ -18,6 +18,7 @@ import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import {Device} from '@/classes/Device';
+import { PropertyValue } from '@/classes/PropertyValue';
 
 import '@/general.scss';
 
@@ -41,6 +42,7 @@ type DeviceDialogState = {
     copy_device: Device | undefined,
     data: any | undefined,
     invalid_inputs: string[],
+    selected_property: PropertyValue | undefined,
     // Design state
     expandedAccordion: string | undefined,
 }
@@ -53,6 +55,7 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
             copy_device: clone(this.props.device),
             data: undefined,
             invalid_inputs: [],
+            selected_property: undefined,
             // Design state
             expandedAccordion: 'properties'
         }
@@ -60,12 +63,15 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
 
     componentDidMount() {
         this.props.device?.full_load().finally(() => {
-            this.setState(state => ({
-                copy_device: clone(this.props.device),
-                data: this.props.device?.get_graph_data(),
-            }));
-
-            this.forceUpdate();
+            this.props.device?.get_graph_data().then((data : any) => {
+                
+                this.setState(state => ({
+                    copy_device: clone(this.props.device),
+                    data: data,
+                }));
+    
+                this.forceUpdate();
+            });
         });
     }
 
@@ -127,7 +133,6 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                                     </div>
                                                 }
                                             </div>
-                                            <Divider />
                                         </div>
                                     )
                                 })}
@@ -137,7 +142,7 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                         disabled={underscore.isEqual(this.props.device.propertyValues, this.state.copy_device?.propertyValues) || this.state.invalid_inputs.length != 0}
                                         onClick={() => this._handleSaveChanges()}
                                         >
-                                        Save
+                                        Save Changes
                                     </Button>
                                 </div>
                             </AccordionDetails>
@@ -149,25 +154,49 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                                 id="panel1bh-header"
                             >
                                 <p className="AccordionTitle">Graphs</p>
+
                             </AccordionSummary>
                             <AccordionDetails>
                                 { this.state.data != undefined &&
                                     <div className="Graph">
-                                        <p className="GraphTitle"> Hourly Changes in Device </p>
-                                        <ResponsiveContainer>
-                                            <LineChart data={this.state.data} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis dataKey="key" />
-                                                <YAxis allowDecimals={false} />
-                                                <Tooltip />
-                                                <Legend />
-                                                { graphLines.map((line) => {
-                                                    return (
-                                                        <Line key={line['weekday']} type="monotone" dataKey={line['weekday']} stroke={line['color']} />
-                                                    )
-                                                })}
-                                            </LineChart>
-                                        </ResponsiveContainer>
+                                        <div className="PropertySelection">
+                                            <TextField className="ValueInput" onChange={this._handleSelectFieldChange}
+                                                required id="graphProperty" label="Property Selected" size="small" select
+                                            >
+                                                {this.props.device.propertyValues?.map((propertyValue) => (
+                                                    <MenuItem id="graphProperty" key={propertyValue.id} value={propertyValue.id}>
+                                                        {propertyValue.property?.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+                                        </div>
+                                        { this.state.selected_property != undefined && this.state.selected_property.property != undefined &&
+                                            <div className="GraphContainer">
+                                                <p className="GraphTitle"> 
+                                                    { "Hourly Changes in " + this.state.selected_property.property.name + " of Device"}
+                                                </p>
+                                                <ResponsiveContainer>
+                                                    <LineChart data={this.state.data[this.state.selected_property.property.id]} 
+                                                        margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                                                            <CartesianGrid strokeDasharray="3 3" />
+                                                            <XAxis dataKey="name">
+                                                                <Label value="Hours" offset={-10} position="insideBottom" />
+                                                            </XAxis>
+                                                            <YAxis allowDecimals={false}>
+                                                                <Label value="Value" offset={20} angle={-90} position="insideLeft" />
+                                                            </YAxis>
+                                                            <Tooltip />
+                                                            <Legend />
+                                                            { graphLines.map((line) => {
+                                                                return (
+                                                                    <Line key={line['weekday']} type="monotone" dataKey={line['weekday']} stroke={line['color']} />
+                                                                )
+                                                            })}
+                                                    </LineChart>
+                                                </ResponsiveContainer>
+
+                                            </div>
+                                        }
                                     </div>
                                 }
                             </AccordionDetails>
@@ -211,8 +240,19 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
 
     _handleSelectFieldChange = (e: React.ChangeEvent<{ value: string }>) => {
         if (e.currentTarget instanceof Element) {
-            this.props.device?.change_property_value(e.currentTarget.id, parseFloat(e.target.value));
-            this.forceUpdate();
+            let targetId = e.currentTarget.id;
+            let newValue = e.target.value;
+
+            switch (targetId) {
+                case 'graphProperty':
+                    let selectedProperty = this.props.device?.propertyValues?.find((propertyValue) => propertyValue.id == newValue);
+                    this.setState(state => ({ selected_property: selectedProperty }));
+                    break;
+                default:
+                    this.props.device?.change_property_value(targetId, parseFloat(newValue));
+                    this.forceUpdate();
+                    break;
+            }
         }
     }
 

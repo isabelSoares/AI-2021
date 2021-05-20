@@ -38,7 +38,6 @@ class AddComponentDialog extends React.Component<AddComponentDialogProps, AddCom
                             required id="name" label={this.props.component_type + " Name"} size="medium"
                             defaultValue=""/>
                 </div>
-                <Divider/>
                 <div className="Buttons">
                     <Button className="Button SaveButton"
                         variant="contained" color="default" size="small"

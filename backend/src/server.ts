@@ -1,5 +1,5 @@
 import express from 'express'
-import { get_reference, get_all_references, get_document, change_document, create_document } from './firebase/firebase_connect';
+import { get_all_references, get_document, change_document } from './firebase/firebase_connect';
 import { create_root_category } from './log/logger';
 let logger = create_root_category('SERVER');
 
@@ -248,6 +248,29 @@ app.post('/property_value/', async (req, res) => {
     
     if (new_id == undefined) res.send("ERROR: Property Value could not be stored");
     else res.send({'new_id' : new_id});
+});
+
+// ============================ DEAL WITH PREFERENCES ============================
+
+app.post('/preference/:preference_id', async (req, res) => {
+    let preference_id = req.params['preference_id'];
+    let data = req.body;
+    utils.update_preference(preference_id, data).then((data) => {
+        if (data == undefined) logger.info("ERROR: Preference not found");
+        else res.send(JSON.stringify(load_preference(data)));
+    });
+});
+
+app.post('/preference/:preference_id/accept', async (req, res) => {
+    let preference_id = req.params['preference_id'];
+    await change_document('preferences', preference_id, { 'pendent': false });
+    res.send({ msg: 'success' });
+});
+
+app.post('/preference/:preference_id/reject', async (req, res) => {
+    let preference_id = req.params['preference_id'];
+    await utils.reject_preference(preference_id);
+    res.send({ msg: 'success' });
 });
 
 app.listen(port, () => {

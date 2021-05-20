@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import { PropertyValue } from '@/classes/PropertyValue';
 import { Schedule } from '@/classes/Schedule';
 
@@ -7,15 +9,17 @@ export class Preference {
     id: string;
     name: string;
     pendent: boolean;
+    deactivated: moment.Moment;
     paths_schedules: string[];
     paths_propertyValues: string[];
     // Objects
     schedules: Schedule[] | undefined;
     propertyValues: PropertyValue[] | undefined;
 
-    constructor(id: string, name: string, pendent:boolean, paths_schedules: string[], paths_propertyValues: string[]) {
+    constructor(id: string, name: string, pendent:boolean, deactivated: string, paths_schedules: string[], paths_propertyValues: string[]) {
         this.id = id;
         this.name = name;
+        this.deactivated = moment(deactivated);
         this.pendent = pendent;
         this.paths_schedules = paths_schedules;
         this.paths_propertyValues = paths_propertyValues;
@@ -29,7 +33,8 @@ export class Preference {
             if (!this.propertyValues) return;
 
             await Promise.all(this.propertyValues.map(async (propertyValue) => {
-                await propertyValue.load_property();
+                await propertyValue.load_device();
+                await propertyValue.load_property()
             }));
         });
 
@@ -59,8 +64,8 @@ export class Preference {
     }
 }
 
-export async function load_preference(id: string, data : {name: string, pendent : boolean, paths_schedules: string[], paths_propertyValues: string[]}) : Promise<Preference> {
-    let new_preference = new Preference(id, data.name, data.pendent, data.paths_schedules, data.paths_propertyValues);
+export async function load_preference(id: string, data : {name: string, pendent: boolean, deactivated: string, paths_schedules: string[], paths_propertyValues: string[]}) : Promise<Preference> {
+    let new_preference = new Preference(id, data.name, data.pendent, data.deactivated, data.paths_schedules, data.paths_propertyValues);
 
     return new_preference;
 }

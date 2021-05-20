@@ -4,6 +4,10 @@ import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
+import IconButton from '@material-ui/core/IconButton';
+
+import DeleteIcon from '@material-ui/icons/Delete';
+import AddBoxIcon from '@material-ui/icons/AddBox';
 
 import {Preference} from '@/classes/Preference';
 
@@ -54,40 +58,63 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                             {this.props.preference.propertyValues && this.props.preference.propertyValues.map((propertyValue, index) => {
                                 return (
                                     <div className="Property" key={propertyValue.id}>
-                                        <div className="PropertyHeader">
-                                            <p className="PropertyName">{propertyValue.property?.name}</p>
-                                            {propertyValue.property?.type.type == "Enumerator" && <p className="PropertyType">{propertyValue.property?.type.format()}</p>}
-                                            {propertyValue.property?.type.type == "Scalar" && <p className="PropertyType">{propertyValue.property?.type.format()}</p>}
+                                        <div className="PropertyComponent PropertyDevice">
+                                            <TextField className="PropertyInput PropertyValueInput" required id="device"
+                                                size="small" name={propertyValue.id} InputProps={{readOnly: true}}
+                                                defaultValue={propertyValue.device?.name}/>
+                                        </div>
+                                        <div className="PropertyComponent PropertyProperty">
+                                            <TextField className="PropertyInput PropertyValueInput" required id="property"
+                                                size="small" name={propertyValue.id} InputProps={{readOnly: true}}
+                                                defaultValue={propertyValue.property?.name}/>
                                         </div>
                                         {propertyValue.property?.type.type == "Enumerator" &&
-                                            <div className="PropertyValue Enumerator">
-                                                <TextField className="PropertyValueInput" required id="enumeratorValue"
+                                            <div className="PropertyComponent PropertyValue Enumerator">
+                                                <TextField className="PropertyInput PropertyValueInput" required id="enumeratorValue"
                                                     size="small" name={propertyValue.id} InputProps={{readOnly: true}}
                                                     defaultValue={propertyValue.property?.type.get_values().find(elem => elem.key == propertyValue.value)?.value}/>
                                             </div>
                                         }
                                         {propertyValue.property?.type.type == "Scalar" &&
-                                            <div className="PropertyValue Scalar">
-                                                <TextField className="PropertyValueInput" required id={propertyValue.id} 
+                                            <div className="PropertyComponent PropertyValue Scalar">
+                                                <TextField className="PropertyInput PropertyValueInput" required id={propertyValue.id} 
                                                     size="small" InputProps={{readOnly: true}} defaultValue={propertyValue.value}/>
                                                 <p className="PropertyUnits">{propertyValue.property?.type.get_units()}</p>
                                             </div>
                                         }
+                                        <IconButton color="primary" component="span" onClick={() => {}}>
+                                            <DeleteIcon className="Icon DeleteIcon"/>
+                                        </IconButton>
                                     </div>
                                 )
                             })}
+                            <div className="ButtonsGroup">
+                                <IconButton color="primary" component="span" onClick={() => {}}>
+                                    <AddBoxIcon className="Icon AddBoxIcon"/>
+                                </IconButton>
+                            </div>
                         </div>
                         {this.props.preference != undefined && this.props.preference.schedules != undefined && this.props.preference.schedules.length >= 1 && <Divider /> }
                         {this.props.preference.schedules != undefined && this.props.preference.schedules.length >= 1 &&
                             <div className="Schedules">
                                 {this.props.preference.schedules?.map((schedule) => {
                                     return (
-                                        <TextField className="PreferenceInput TextField Schedule" key={schedule.id}
-                                            label="Schedule To" type="datetime-local" defaultValue={schedule.timestamp.format()}
-                                            InputLabelProps={{ shrink: true }}
-                                        />
+                                        <div className="Schedule">
+                                            <TextField className="PreferenceInput TextField Schedule" key={schedule.id}
+                                                label="Schedule To" type="time" defaultValue={schedule.timestamp.format("HH:mm")}
+                                                InputLabelProps={{ shrink: true }}
+                                            />
+                                            <IconButton color="primary" component="span" onClick={() => {}}>
+                                                <DeleteIcon className="Icon DeleteIcon"/>
+                                            </IconButton>
+                                        </div>
                                     )
                                 })}
+                                <div className="ButtonsGroup">
+                                    <IconButton color="primary" component="span" onClick={() => {}}>
+                                        <AddBoxIcon className="Icon AddBoxIcon"/>
+                                    </IconButton>
+                                </div>
                             </div>
                         }
                         <Divider />
