@@ -83,7 +83,7 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
                         <div className="DeviceHeader">
                             <div className="DeviceMainInfo">
                                 <p className="DeviceName"> {this.props.device.name} </p>
-                                <p className="DeviceType"> {this.props.device.name} </p>
+                                <p className="DeviceType"> {this.props.device.deviceType?.name} </p>
                             </div>
                             <IconButton color="primary" component="span" onClick={() => this._handleChangeFavoriteState()}>
                                 {this.props.device.favorite && <Favorite className="FavoriteIcon"/>}
