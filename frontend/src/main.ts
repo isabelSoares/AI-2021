@@ -18,6 +18,7 @@ const createWindow = (): void => {
             ? 'http://localhost:9000'
             : `file://${app.getAppPath()}/index.html`,
     );
+    win.removeMenu();
 }
 
 app.on('ready', createWindow);
