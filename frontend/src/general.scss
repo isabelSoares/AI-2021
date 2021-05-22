@@ -3,6 +3,7 @@ $background-color: rgba(225, 247, 226, 1);
 $accent-color: rgba(21, 77, 24, 1);
 
 $button-color: rgba(23, 115, 28, 1);
+$button-yellow: rgb(139, 102, 0);
 $button-red: rgba(139, 0, 0, 1);
 $button-unselected-color: rgba(230, 230, 230, 1);
 $button-hover-color: rgba(210, 210, 210, 1);
@@ -672,7 +673,7 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
 
     .PreferenceHeader {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         padding: 5px 10px 10px 10px;
@@ -682,6 +683,20 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             margin-bottom: 0px;
             font-weight: bold;
             font-size: large;
+        }
+
+        .ComponentSubtitle {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            p {
+                margin-top: 0px;
+                margin-bottom: 2px;
+                font-size: small;
+                color: gray;
+            }
         }
     }
 
@@ -835,8 +850,11 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
         }
 
         .Button.ApplyButton {
-            width: 99%;
-            background-color: $accent-color;
+            background-color: $button-color;
+        }
+
+        .Button.SuspendButton {
+            background-color: $button-yellow;
         }
     }
 }

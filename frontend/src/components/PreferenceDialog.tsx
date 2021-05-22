@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
@@ -47,6 +48,12 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                     <div>
                         <div className="PreferenceHeader">
                             <p className="ComponentName"> Preference </p>
+                            {this.props.preference.deactivated.isAfter(moment()) && 
+                                <div className="ComponentSubtitle">
+                                    <p> Scheduling deactivated till </p>
+                                    <p> {this.props.preference.deactivated.format("DD/MM/YYYY - HH:mm")} </p>
+                                </div>
+                            }
                         </div>
                         <div className="PreferenceContent">
                             <TextField className="PreferenceInput TextField Name" onChange={this._handleTextFieldChange} 
@@ -99,7 +106,7 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                             <div className="Schedules">
                                 {this.props.preference.schedules?.map((schedule) => {
                                     return (
-                                        <div className="Schedule">
+                                        <div className="Schedule" key={schedule.id}>
                                             <TextField className="PreferenceInput TextField Schedule" key={schedule.id}
                                                 label="Schedule To" type="time" defaultValue={schedule.timestamp.format("HH:mm")}
                                                 InputLabelProps={{ shrink: true }}
@@ -122,7 +129,7 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                             {this.props.preference.pendent && 
                                 <Button className="Button AcceptButton"
                                     variant="contained" color="default" size="small"
-                                    onClick={() => {}}
+                                    onClick={this._acceptPreference}
                                 >
                                     Accept
                                 </Button>
@@ -130,7 +137,7 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                             {this.props.preference.pendent &&
                                 <Button className="Button RejectButton"
                                     variant="contained" color="default" size="small"
-                                    onClick={() => {}}
+                                    onClick={this._rejectPreference}
                                 >
                                     Reject
                                 </Button>
@@ -138,9 +145,25 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                             {!this.props.preference.pendent &&
                                 <Button className="Button ApplyButton"
                                     variant="contained" color="default" size="small"
-                                    onClick={() => {}}
+                                    onClick={this._applyPreference}
                                 >
                                     Apply Now
+                                </Button>
+                            }
+                            {!this.props.preference.pendent &&
+                                <Button className="Button SuspendButton"
+                                    variant="contained" color="default" size="small"
+                                    onClick={this._deactivatePreference}
+                                >
+                                    Suspend 24H
+                                </Button>
+                            }
+                            {!this.props.preference.pendent &&
+                                <Button className="Button RejectButton"
+                                    variant="contained" color="default" size="small"
+                                    onClick={this._rejectPreference}
+                                >
+                                    Delete
                                 </Button>
                             }
                         </div>
@@ -172,6 +195,26 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                 
             }
         }
+    }
+
+    _acceptPreference = async () => {
+        await this.props.preference?.accept();
+        this.forceUpdate();
+    }
+
+    _rejectPreference = async () => {
+        await this.props.preference?.reject();
+        this.props.close_function();
+    }
+
+    _deactivatePreference = async () => {
+        await this.props.preference?.deactivate();
+        this.forceUpdate();
+    }
+
+    _applyPreference = async () => {
+        await this.props.preference?.apply();
+        this.forceUpdate();
     }
 
     // ============================== CHECK EVENTS ==============================

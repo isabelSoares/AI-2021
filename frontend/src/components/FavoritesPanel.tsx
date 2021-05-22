@@ -73,7 +73,7 @@ class FavoritesPanel extends React.Component<ReduxType, DevicesPanelState> {
                     open={this.state.modalOpen}
                     onClose={this._handleModalClose}
                 >
-                    <DeviceDialog device={this.state.selectedDevice} close_function={this._handleModalClose} />
+                    <DeviceDialog user_id={this.props.user?.id} device={this.state.selectedDevice} close_function={this._handleModalClose} />
                 </Dialog>
             </div>
         )

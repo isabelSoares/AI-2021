@@ -34,6 +34,7 @@ const graphLines = [
 
 // Definition of State and Props
 type DeviceDialogProps = {
+    user_id: string | undefined,
     device: Device | undefined,
     close_function: () => void,
 }
@@ -257,9 +258,9 @@ class DeviceDialog extends React.Component<DeviceDialogProps, DeviceDialogState>
     }
 
     _handleSaveChanges = async () => {
-        if (this.state.copy_device == undefined) return;
+        if (this.props.user_id == undefined || this.state.copy_device == undefined) return;
 
-        await this.props.device?.save_new_properties(this.state?.copy_device);
+        await this.props.device?.save_new_properties(this.props.user_id, this.state?.copy_device);
         this.setState(state => ({ copy_device: clone(this.props.device) }));
         this.forceUpdate();
     }

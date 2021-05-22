@@ -15,6 +15,8 @@ export class Preference {
     // Objects
     schedules: Schedule[] | undefined;
     propertyValues: PropertyValue[] | undefined;
+    // Utils
+    deleted = false;
 
     constructor(id: string, name: string, pendent:boolean, deactivated: string, paths_schedules: string[], paths_propertyValues: string[]) {
         this.id = id;
@@ -61,6 +63,27 @@ export class Preference {
 
             this.schedules?.push(schedule);
         }));
+    }
+
+    // ======================== CHANGE STATE ========================
+
+    async accept() {
+        await Router.accept_preference(this.id);
+        this.pendent = false;
+    }
+
+    async reject() {
+        await Router.reject_preference(this.id);
+        this.deleted = true;
+    }
+
+    async deactivate() {
+        await Router.deactivate_preference(this.id);
+        this.deactivated = moment().add(1, 'days');
+    }
+
+    async apply() {
+        await Router.apply_preference(this.id);
     }
 }
 

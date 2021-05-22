@@ -47,7 +47,7 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
                         <div className="main-content">
                             {this.props.user && this.props.user.preferences &&
                                 <div className="options">
-                                    {this.props.user.preferences.filter((element) => element.pendent).map((element) => {
+                                    {this.props.user.preferences.filter((element) => element.pendent && !element.deleted).map((element) => {
                                         return <Button className="SelectionButton" key={element.id} variant="contained" 
                                             onClick={() => this._handleClickPreference(element.id)}
                                             >
@@ -67,7 +67,7 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
                         <div className="main-content">
                             {this.props.user && this.props.user.preferences &&
                                 <div className="options">
-                                    {this.props.user.preferences.filter((element) => !element.pendent).map((element) => {
+                                    {this.props.user.preferences.filter((element) => !element.pendent && !element.deleted).map((element) => {
                                         return <Button className="SelectionButton" key={element.id} variant="contained" 
                                             onClick={() => this._handleClickPreference(element.id)}
                                             >

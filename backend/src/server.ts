@@ -1,7 +1,10 @@
-import express from 'express'
+import express from 'express';
+import * as admin from 'firebase-admin';
 import { get_all_references, get_document, change_document } from './firebase/firebase_connect';
 import { create_root_category } from './log/logger';
 let logger = create_root_category('SERVER');
+
+import moment from 'moment';
 
 // Classes
 import { load_user } from './classes/User'
@@ -20,6 +23,7 @@ import * as utils from './utils';
 
 // Run Intelligence Module
 import IntelligenceModule from './intelligence';
+import intelligence from './intelligence';
 setInterval(() => IntelligenceModule.process_entry(), 2000);
 
 const app = express();
@@ -247,7 +251,10 @@ app.post('/property_value/', async (req, res) => {
     let new_id = await utils.change_property_value(req.body['propertyValue_id'], req.body['value']);
     
     if (new_id == undefined) res.send("ERROR: Property Value could not be stored");
-    else res.send({'new_id' : new_id});
+    else {
+        intelligence.register_value_change(req.body['user_id'], req.body['propertyValue_id'], req.body['value']);
+        res.send({'new_id' : new_id});
+    }
 });
 
 // ============================ DEAL WITH PREFERENCES ============================
@@ -270,6 +277,22 @@ app.post('/preference/:preference_id/accept', async (req, res) => {
 app.post('/preference/:preference_id/reject', async (req, res) => {
     let preference_id = req.params['preference_id'];
     await utils.reject_preference(preference_id);
+    res.send({ msg: 'success' });
+});
+
+app.post('/preference/:preference_id/deactivate', async (req, res) => {
+    let preference_id = req.params['preference_id'];
+
+    let delayTo = moment().add(1, 'days').toDate();
+    let data = { 'deactivated': admin.firestore.Timestamp.fromDate(delayTo) }
+    await change_document('preferences', preference_id, data);
+    res.send({ msg: 'success' });
+});
+
+app.post('/preference/:preference_id/apply', async (req, res) => {
+    let preference_id = req.params['preference_id'];
+    
+    await utils.apply_preference(preference_id);
     res.send({ msg: 'success' });
 });
 

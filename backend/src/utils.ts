@@ -371,3 +371,8 @@ export async function update_preference(preference_id: string, data: any) : Prom
     let newData = await get_document('preferences', preference_id);
     return newData;
 }
+
+export async function apply_preference(preference_id: string) : Promise<void> {
+    // TODO
+    console.log("TODO");
+}

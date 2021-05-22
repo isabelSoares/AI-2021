@@ -92,7 +92,7 @@ export class Device {
     
     // ==================== SEND EVENTS ====================
 
-    async save_new_properties(reference_device: Device) {
+    async save_new_properties(user_id: string, reference_device: Device) {
         if (this.propertyValues == undefined) return;
 
         let to_be_saved_properties : PropertyValue[] = this.propertyValues?.filter((propertyValue) => {
@@ -108,7 +108,7 @@ export class Device {
             let propertyValue_id = propertyValue.id;
             let propertyValue_value = propertyValue.value;
 
-            let new_id = await Router.change_property_value(propertyValue_id, propertyValue_value);
+            let new_id = await Router.change_property_value(user_id, propertyValue_id, propertyValue_value);
             // Update propertyValue id
             let previous_propertyValue = this.propertyValues?.find((storedProperty) => storedProperty.id == propertyValue.id);
             if (previous_propertyValue != undefined) { previous_propertyValue.id = new_id; }
@@ -181,7 +181,6 @@ export class Device {
             }
         }
         
-        console.table(binnedByWeekdayHour);
         // Convert to propper data format
         let data : any = {};
         for (let propertyId in binnedByWeekdayHour) {
@@ -194,8 +193,6 @@ export class Device {
                 data[propertyId].push(new_object);
             }
         }
-
-        console.table(data);
 
         return data;
     }

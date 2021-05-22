@@ -86,7 +86,7 @@ class DevicesPanel extends React.Component<ReduxType, DevicesPanelState> {
                     open={this.state.modalDeviceOpen}
                     onClose={this._handleModalDeviceClose}
                 >
-                    <DeviceDialog device={this.state.selectedDevice} close_function={this._handleModalDeviceClose} />
+                    <DeviceDialog user_id={this.props.user?.id} device={this.state.selectedDevice} close_function={this._handleModalDeviceClose} />
                 </Dialog>
                 <Dialog
                     open={this.state.modalAddDeviceOpen}

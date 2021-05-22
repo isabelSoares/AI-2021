@@ -362,9 +362,9 @@ class RouterAPI {
         });
     }
 
-    async change_property_value(propertyValue_id: string, new_value: number) : Promise<string> {
+    async change_property_value(user_id: string, propertyValue_id: string, new_value: number) : Promise<string> {
         let address : string = this.domain + "property_value/";
-        let body = { 'propertyValue_id': propertyValue_id, 'value': new_value };
+        let body = { 'user_id': user_id, 'propertyValue_id': propertyValue_id, 'value': new_value };
 
         return new Promise<string>((resolve, reject) => {
             this.post(address, body).then((response) => {
@@ -388,6 +388,58 @@ class RouterAPI {
                     console.log("ERROR");
                     reject;
                 } else resolve(load_house(house_id, response.data));
+            });
+        });
+    }
+
+    async accept_preference(preference_id: string) : Promise<void> {
+        let address : string = this.domain + "preference/" + preference_id + "/accept";
+
+        return new Promise<void>((resolve, reject) => {
+            this.post(address, {}).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else resolve();
+            });
+        });
+    }
+
+    async reject_preference(preference_id: string) : Promise<void> {
+        let address : string = this.domain + "preference/" + preference_id + "/reject";
+
+        return new Promise<void>((resolve, reject) => {
+            this.post(address, {}).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else resolve();
+            });
+        });
+    }
+
+    async deactivate_preference(preference_id: string) : Promise<void> {
+        let address : string = this.domain + "preference/" + preference_id + "/deactivate";
+
+        return new Promise<void>((resolve, reject) => {
+            this.post(address, {}).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else resolve();
+            });
+        });
+    }
+
+    async apply_preference(preference_id: string) : Promise<void> {
+        let address : string = this.domain + "preference/" + preference_id + "/apply";
+
+        return new Promise<void>((resolve, reject) => {
+            this.post(address, {}).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else resolve();
             });
         });
     }
