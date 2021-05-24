@@ -10,11 +10,9 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 
-import {Preference} from '@/classes/Preference';
+import { Preference } from '@/classes/Preference';
 import { Device } from '@/classes/Device';
 import { Property } from '@/classes/Property';
-
-import Router from '@/utils/endpointAPI';
 
 import '@/general.scss';
 
@@ -37,7 +35,7 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
         super(props);
 
         this.state = {
-            preference_name: undefined,
+            preference_name: this.props.preference?.name,
             propertyValues: [],
             schedules: [],
         }
@@ -45,7 +43,6 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
 
     async componentDidMount() {
         await this.props.preference?.full_load();
-        console.table(this.props.preference);
 
         if (!this.props.preference || !this.props.preference.propertyValues) {
             this.forceUpdate();
@@ -76,7 +73,8 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
             if (property == undefined) return;
             
             return {'device': device, 'property': property, 'value': propertyValue.value }
-        }).filter((item): item is {'device': Device, 'property': Property, 'value': number} => !!item);
+        }).filter(elem => elem != undefined && elem.device != undefined && elem.property != undefined && elem.value != undefined)
+            .filter((item): item is {'device': Device, 'property': Property, 'value': number} => !!item);
 
         // ========================== Schedules ==========================
 
@@ -87,8 +85,6 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
             propertyValues: propertyValues, 
             schedules: (schedules ? schedules : [])
         }));
-
-        console.log("State:", this.state);
     }
 
     render() {
@@ -184,7 +180,7 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                             {this.state.schedules.map((schedule, index) => {
                                 return (
                                     <div className="Schedule" key={index}>
-                                        <TextField className="PreferenceInput TextField Schedule"
+                                        <TextField className="PreferenceInput TextField Schedule" onChange={(e) => this._handleSelectSchedule(index, e)}
                                             label="Schedule To" type="time" defaultValue={schedule.format("HH:mm")}
                                             InputLabelProps={{ shrink: true }}
                                         />
@@ -276,6 +272,7 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
                 await device.full_load();
 
                 propertyValues[index].device = device;
+                propertyValues[index].property = undefined;
 
             } else if (type == 'property') {
                 let device = propertyValues[index].device;
@@ -283,7 +280,9 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
 
                 let propertyValue = device.propertyValues?.find(propertyValue => propertyValue.property?.id == newValue);
                 if (propertyValue == undefined) return;
+
                 propertyValues[index].property = propertyValue.property;
+                propertyValues[index].value = undefined;
 
             } else if (type == 'value') {
                 propertyValues[index].value = parseFloat(newValue);
@@ -301,6 +300,18 @@ class PreferenceDialog extends React.Component<PreferenceDialogProps, Preference
 
             propertyValues[index].value = value;
             this.setState(state => ({ propertyValues: propertyValues }));
+
+            this.save_state();
+        }
+    }
+
+    _handleSelectSchedule = (index: number, e: React.ChangeEvent<{ value: string }>) => {
+        if (e.target instanceof Element) {
+            let value = e.target.value;
+            let schedules = this.state.schedules;
+
+            schedules[index] = moment(value, "HH:mm");
+            this.setState(state => ({ schedules: schedules }));
 
             this.save_state();
         }

@@ -5,6 +5,8 @@ import { Schedule } from '@/classes/Schedule';
 
 import Router from '@/utils/endpointAPI';
 import { any } from 'underscore';
+import { Device } from './Device';
+import { Property } from './Property';
 
 export class Preference {
     id: string;
@@ -98,9 +100,19 @@ export class Preference {
         this.save_state = data;
     }
 
-    save_sate_to_database() {
-        // TODO
-        console.log(this.save_state);
+    get_save_state() {
+
+        if (this.save_state == undefined) return undefined;
+        
+        let treated_data = {
+            'name': this.save_state.name,
+            'properties': this.save_state.properties.map( (elem: {'device': Device, 'property': Property, 'value': number} ) => {
+                return {'device': elem.device.id, 'property': elem.property.id, 'value': elem.value }
+            }),
+            'schedules': this.save_state.schedules.map( (elem : string) => { return { 'timestamp': elem }})
+        }
+
+        return treated_data;
     }
 }
 

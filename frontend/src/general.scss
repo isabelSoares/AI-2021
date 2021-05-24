@@ -863,6 +863,10 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
         .Button.SuspendButton {
             background-color: $button-yellow;
         }
+
+        .Button.SaveButton:not(.Mui-disabled) {
+            background-color: $accent-color;
+        }
     }
 }
 

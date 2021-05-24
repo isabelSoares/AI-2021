@@ -9,6 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 
 import PreferenceDialog from '@/components/PreferenceDialog';
+import AddPreferenceDialog from '@/components/AddPreferenceDialog';
 
 import { Preference } from '@/classes/Preference';
 import { Device } from '@/classes/Device';
@@ -22,7 +23,8 @@ type SchedulesPanelState = {
     allDevices: Device[],
     selectedPreference: Preference | undefined,
     // Design state
-    modalOpen: boolean,
+    modalPreferenceOpen: boolean,
+    modalNewPreferenceOpen: boolean,
 }
 
 class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
@@ -33,14 +35,14 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
             allDevices: [],
             selectedPreference: undefined,
             // Design state
-            modalOpen: false,
+            modalPreferenceOpen: false,
+            modalNewPreferenceOpen: false,
         }
     }
 
     async componentDidMount() {
         this.props.user?.load_preferences().finally(() => {
             this.forceUpdate();
-            console.table(this.props.user?.preferences);
         });
 
         if (this.props.user != undefined) {
@@ -91,17 +93,23 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
                             }
                         </div>
                         <div className="Buttons"> 
-                            <IconButton color="primary" component="span" onClick={() => {}}>
+                            <IconButton color="primary" component="span" onClick={this._handleClickNewPreference}>
                                 <AddBoxIcon className="AddBoxIcon"/>
                             </IconButton>
                         </div>
                     </div>
                 </div>
                 <Dialog
-                    open={this.state.modalOpen}
-                    onClose={this._handleModalClose}
+                    open={this.state.modalPreferenceOpen}
+                    onClose={this._handlePreferenceModalClose}
                 >
-                    <PreferenceDialog devices={this.state.allDevices} preference={this.state.selectedPreference} close_function={this._handleModalClose} />
+                    <PreferenceDialog devices={this.state.allDevices} preference={this.state.selectedPreference} close_function={this._handlePreferenceModalClose} />
+                </Dialog>
+                <Dialog
+                    open={this.state.modalNewPreferenceOpen}
+                    onClose={this._handleNewPreferenceModalClose}
+                >
+                    <AddPreferenceDialog devices={this.state.allDevices} save_function={this._handleSaveNewPreference} close_function={this._handleNewPreferenceModalClose} />
                 </Dialog>
             </div>
         )
@@ -109,9 +117,19 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
     
     // ============================== CHECK EVENTS ==============================
 
-    _handleModalClose = () => {
-        this.state.selectedPreference?.save_sate_to_database();
-        this.setState(state => ({ modalOpen: false }));
+    _handlePreferenceModalClose = () => {
+        if (this.state.selectedPreference == undefined) return;
+
+        this.props.user?.update_preference(this.state.selectedPreference.id);
+        this.setState(state => ({ modalPreferenceOpen: false }));
+    }
+
+    _handleNewPreferenceModalClose = () => {
+        this.setState(state => ({ modalNewPreferenceOpen: false }));
+    }
+
+    _handleSaveNewPreference = async (data: {'name': string, 'properties': {'device': string, 'property': string, 'value': number}[], 'schedules': {'timestamp': string}[] }) => {
+        await this.props.user?.create_preference(data);
     }
 
     // ============================== INPUT EVENTS ==============================
@@ -124,8 +142,12 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
         
         this.setState(state => ({
             selectedPreference: selectedPreference,
-            modalOpen: true,
+            modalPreferenceOpen: true,
         }));
+    }
+
+    _handleClickNewPreference = () => {
+        this.setState(state => ({ modalNewPreferenceOpen: true }));
     }
 
 }

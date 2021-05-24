@@ -204,6 +204,28 @@ export class User {
         let pathDevice = "devices/" + newDevice.id;
         this.division_selected?.paths_devices.push(pathDevice);
     }
+
+    async update_preference(preference_id: string) {
+
+        let preference_to_update = this.preferences?.find(preference => preference.id == preference_id);
+        if (preference_to_update == undefined) return;
+
+        let state = preference_to_update.get_save_state();
+        if (state == undefined) return;
+        
+        // Update
+        let new_preference = await Router.change_preference(preference_id, preference_to_update.get_save_state());
+        this.preferences = this.preferences?.map(preference => preference.id == preference_id ? new_preference : preference);
+    }
+
+    async create_preference(data: {'name': string, 'properties': {'device': string, 'property': string, 'value': number}[], 'schedules': {'timestamp': string}[] }) {
+        let newPreference = await Router.create_new_preference(this.id, data);
+        this.preferences?.push(newPreference);
+
+        // Add to path correspondent
+        let pathPreference = "preferences/" + newPreference.id;
+        this.paths_preferences.push(pathPreference);
+    }
 }
 
 export function load_user(id: string, data : {name: string, paths_preferences: string[], paths_houses: string[]}) : User {

@@ -54,7 +54,7 @@ class RouterAPI {
         let user = await firebase.auth().signInWithEmailAndPassword(user_email, user_password).then((userCredential) => {
             return userCredential.user;
         }).catch((error) => {
-            console.log(error);
+            console.log("ERROR");
             return null;
         });
         if (user == null) return undefined;
@@ -263,7 +263,7 @@ class RouterAPI {
         let user = await firebase.auth().createUserWithEmailAndPassword(email, password).then((userCredential) => {
             return userCredential.user;
         }).catch((error) => {
-            console.log(error);
+            console.log("ERROR");
             return null;
         });
 
@@ -355,6 +355,28 @@ class RouterAPI {
         });
     }
 
+    async create_new_preference(user_id: string, data: {'name': string, 'properties': {'device': string, 'property': string, 'value': number}[], 'schedules': {'timestamp': string}[] }) {
+
+        let address : string = this.domain + 'preference/';
+        let body = {
+            'user_id': user_id,
+            'name': data.name,
+            'properties': data.properties,
+            'schedules': data.schedules,
+        };
+
+        return new Promise<Preference>((resolve, reject) => {
+            this.post(address, body).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else {
+                    resolve(load_preference(response.data.id, response.data.object));
+                }
+            });
+        });
+    }
+
     // ================ SPECIFIC REQUESTS : CHANGES  ================
 
     async add_favorites(device_id: string) {
@@ -407,6 +429,8 @@ class RouterAPI {
         });
     }
 
+    // ================ SPECIFIC REQUESTS : PREFERENCES  ================
+
     async accept_preference(preference_id: string) : Promise<void> {
         let address : string = this.domain + "preference/" + preference_id + "/accept";
 
@@ -455,6 +479,19 @@ class RouterAPI {
                     console.log("ERROR");
                     reject;
                 } else resolve();
+            });
+        });
+    }
+
+    async change_preference(preference_id: string, data: any) : Promise<Preference> {
+        let address : string = this.domain + "preference/" + preference_id;
+
+        return new Promise<Preference>((resolve, reject) => {
+            this.post(address, data).then((response) => {
+                if (typeof response.data === "string") {
+                    console.log("ERROR");
+                    reject;
+                } else resolve(load_preference(preference_id, response.data));
             });
         });
     }

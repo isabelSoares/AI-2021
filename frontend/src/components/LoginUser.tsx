@@ -31,8 +31,6 @@ class LoginUser extends React.Component<ReduxType, LoginUserState> {
             userEmail: undefined,
             userPassword: undefined,
         }
-
-        console.log(this.state);
     }
     
     render() {
