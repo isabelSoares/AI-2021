@@ -13,10 +13,10 @@ import { load_propertyValue } from './classes/PropertyValue';
 import { load_schedule } from './classes/Schedule';
 import { load_preference } from './classes/Preference';
 import { load_valueHistory } from './classes/ValueHistory';
-import firebase from 'firebase';
+import moment from 'moment';
 
-// Get Favorite Devices
-export async function get_favorite_devices(user_id: string) : Promise<{'id': string, 'device': Device}[]> {
+
+export async function get_devices(user_id: string) : Promise<{'id': string, 'device': Device}[]> {
 
     // Load User
     let data_user = await get_document('users', user_id);
@@ -68,6 +68,12 @@ export async function get_favorite_devices(user_id: string) : Promise<{'id': str
         .filter((data_device): data_device is {'id': string, 'device': FirebaseFirestore.DocumentData} => !!data_device)
         .map((data_device) => { return {'id': data_device.id, 'device': load_device(data_device.device)}});
 
+    return devices;
+}
+
+export async function get_favorite_devices(user_id: string) : Promise<{'id': string, 'device': Device}[]> {
+
+    let devices = await get_devices(user_id);
     return devices.filter((element) => element.device.favorite);
 }
 
@@ -373,6 +379,99 @@ export async function update_preference(preference_id: string, data: any) : Prom
 }
 
 export async function apply_preference(preference_id: string) : Promise<void> {
-    // TODO
-    console.log("TODO");
+    // Get preference reference
+    let preferenceReference = await get_reference('preferences', preference_id);
+    let preferenceDocument = await preferenceReference.get();
+    let preferenceData = preferenceDocument.data();
+    if (preferenceData == undefined) return;
+
+    let propertyValueReferences = preferenceData['propertyValues'];
+    propertyValueReferences.forEach(async (propertyValueReference : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
+
+        // Get new propertyValue
+        let propertyValueDocument = await propertyValueReference.get();
+        let propertyValueData = propertyValueDocument.data();
+        if (propertyValueData == undefined) return;
+
+        // Get property to change
+        let propertyReference = propertyValueData['property'];
+
+        // Get device
+        let deviceReference : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> = propertyValueData['device'];
+        let deviceDocument = await deviceReference.get();
+        let deviceData = deviceDocument.data();
+        if (deviceData == undefined) return;
+
+        // Change Device property Values
+        let deviceSetPropertyValues = deviceData['propertyValues'];
+        let deviceNewPropertyValues = await Promise.all<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>>(
+            deviceSetPropertyValues.map(async (prevPropertyValueReference : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
+
+                let prevPropertyValueDocument = await prevPropertyValueReference.get();
+                let prevPropertyValueData = prevPropertyValueDocument.data();
+                if (prevPropertyValueData == undefined) return prevPropertyValueReference;
+
+                let prevPropertyReference : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> = prevPropertyValueData['property'];
+                if (prevPropertyReference.isEqual(propertyReference)) return propertyValueReference;
+                else return prevPropertyValueReference;
+            })
+        );
+
+        // Write back to Device
+        await deviceReference.update({ 'propertyValues': deviceNewPropertyValues });
+    });
+}
+
+export async function create_preference(data: any) : Promise<FirebaseFirestore.DocumentData | undefined> {
+
+    // Get User
+    let user_id = data['user_id'];
+    let userReference = await get_reference('users', user_id);
+    let userDocument = await userReference.get();
+    let userData = userDocument.data();
+    if (userData == undefined) return undefined;
+
+    // Do Property Values new association
+    let properties : {'device': string, 'property': string, 'value': number}[] = data['properties'];
+    let properties_to_add : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>[] = [];
+
+    await Promise.all(properties.map( async (property) => {
+        
+        let deviceReference = await get_reference('devices', property.device);
+        let propertyReference = await get_reference('properties', property.property);
+        let propertyValueData = { 'device': deviceReference, 'property': propertyReference, 'value': property.value };
+        let propertyValueReference = await create_document('propertyValues', propertyValueData);
+        properties_to_add.push(propertyValueReference);
+    }));
+
+    // Do Schedules new association
+    let schedules : { 'timestamp': string }[] = data['schedules'];
+    let schedules_to_add : FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>[] = [];
+
+    await Promise.all(schedules.map( async (schedule) => {
+        let date = new Date(schedule.timestamp);
+        let scheduleReference = await create_document('schedules', {'timestamp': admin.firestore.Timestamp.fromDate(date)})
+        schedules_to_add.push(scheduleReference);
+    }));
+
+    let new_info = {
+        'name': data['name'],
+        'propertyValues': properties_to_add,
+        'schedules': schedules_to_add,
+        'user': userReference,
+        'pendent': false,
+        'deactivated': admin.firestore.Timestamp.fromDate(new Date('1970-01-01Z00:00:00:000')),
+    };
+
+    let preferenceReference = await create_document('preferences', new_info);
+    let preferenceDocument = await preferenceReference.get();
+    let preferenceData = preferenceDocument.data();
+    if (preferenceData == undefined) return undefined;
+
+    // Update User
+    let user_preferences = userData['preferences'];
+    user_preferences.push(preferenceReference);
+    await userReference.update({ 'preferences': user_preferences });
+
+    return { 'id': preferenceReference.id, 'data': preferenceData };
 }

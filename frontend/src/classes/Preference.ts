@@ -4,6 +4,7 @@ import { PropertyValue } from '@/classes/PropertyValue';
 import { Schedule } from '@/classes/Schedule';
 
 import Router from '@/utils/endpointAPI';
+import { any } from 'underscore';
 
 export class Preference {
     id: string;
@@ -17,6 +18,7 @@ export class Preference {
     propertyValues: PropertyValue[] | undefined;
     // Utils
     deleted = false;
+    save_state: any = {};
 
     constructor(id: string, name: string, pendent:boolean, deactivated: string, paths_schedules: string[], paths_propertyValues: string[]) {
         this.id = id;
@@ -36,7 +38,7 @@ export class Preference {
 
             await Promise.all(this.propertyValues.map(async (propertyValue) => {
                 await propertyValue.load_device();
-                await propertyValue.load_property()
+                await propertyValue.load_property();
             }));
         });
 
@@ -65,7 +67,7 @@ export class Preference {
         }));
     }
 
-    // ======================== CHANGE STATE ========================
+    // ======================== CHANGE STATE ASYNC ========================
 
     async accept() {
         await Router.accept_preference(this.id);
@@ -84,6 +86,21 @@ export class Preference {
 
     async apply() {
         await Router.apply_preference(this.id);
+    }
+
+    // ======================== CHANGE STATE ========================
+
+    clear_save_state() {
+        this.save_state = undefined;
+    }
+
+    save_state_locally(data: any) {
+        this.save_state = data;
+    }
+
+    save_sate_to_database() {
+        // TODO
+        console.log(this.save_state);
     }
 }
 

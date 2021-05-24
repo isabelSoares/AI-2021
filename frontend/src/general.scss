@@ -735,29 +735,36 @@ form .TextField .MuiInput-underline:not(.Mui-error):after {
             flex-direction: row;
             justify-content: space-between;
             
-            .PropertyComponent {
-                margin-bottom: 0px;
-                margin-top: 8px;
-                font-size: 15px;
-
-                .PropertyInput{
-                    width: 90%;
-                }
-
-                .PropertyInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
-                    color: green;
-                }
-                
-                .PropertyInput .MuiInput-underline:not(.Mui-error):after {
-                    border-bottom-color: $button-color;
-                }
-            }
-
-            .PropertyValue.Scalar{
+            .MainPart {
+                width: 100%;
                 display: flex;
                 flex-direction: row;
+                justify-content: space-between;
+
+                .PropertyComponent {
+                    margin-bottom: 0px;
+                    margin-top: 8px;
+                    font-size: 15px;
+                    width: 100%;
+    
+                    .PropertyInput{
+                        width: 90%;
+                    }
+    
+                    .PropertyInput .MuiFormLabel-root.Mui-focused:not(.Mui-error) {
+                        color: green;
+                    }
+                    
+                    .PropertyInput .MuiInput-underline:not(.Mui-error):after {
+                        border-bottom-color: $button-color;
+                    }
+                }
+    
+                .PropertyValue.Scalar{
+                    display: flex;
+                    flex-direction: row;
+                }
             }
-            
         }
 
         .ButtonsGroup {

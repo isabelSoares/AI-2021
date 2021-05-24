@@ -184,6 +184,21 @@ class RouterAPI {
             });
         });
     }
+
+    async load_devices(user_id: string) {
+        let address : string = this.domain + "devices/" + user_id;
+
+        let response = await this.get(address);
+        if (typeof response.data === "string") {
+            console.log("ERROR");;
+            return [];
+        } else {
+            let devices : Device[] = await Promise.all(response.data.map(async (device_data: {'id': string, 'device': any}) => {
+                return await load_device(device_data.id, device_data.device);
+            }));
+            return devices;
+        }
+    }
     
     async load_property(property_id: string) {
         let address : string = this.domain + "property/" + property_id;

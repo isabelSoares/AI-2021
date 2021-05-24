@@ -105,6 +105,13 @@ app.get('/device/:device_id', (req, res) => {
     });
 });
 
+app.get('/devices/:user_id', async (req, res) => {
+
+    let user_id = req.params['user_id'];
+    let devices = await utils.get_devices(user_id);
+    res.send(JSON.stringify(devices));
+});
+
 app.get('/device_type/:deviceType_id', (req, res) => {
 
     let deviceType_id = req.params['deviceType_id'];
@@ -259,11 +266,20 @@ app.post('/property_value/', async (req, res) => {
 
 // ============================ DEAL WITH PREFERENCES ============================
 
+app.post('/preference/', async (req, res) => {
+    let data = req.body;
+
+    utils.create_preference(data).then((data) => {
+        if (data == undefined) logger.info("ERROR: Preference not created");
+        else res.send(JSON.stringify({'id': data.id, 'object': load_preference(data.data)}));
+    });
+});
+
 app.post('/preference/:preference_id', async (req, res) => {
     let preference_id = req.params['preference_id'];
     let data = req.body;
     utils.update_preference(preference_id, data).then((data) => {
-        if (data == undefined) logger.info("ERROR: Preference not found");
+        if (data == undefined) logger.info("ERROR: Preference not updated");
         else res.send(JSON.stringify(load_preference(data)));
     });
 });

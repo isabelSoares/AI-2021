@@ -4,15 +4,22 @@ import { ReduxType, mapStateToProps, mapDispatcherToProps } from '@/utils/store/
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
+import IconButton from '@material-ui/core/IconButton';
 
-import { Preference } from '@/classes/Preference';
+import AddBoxIcon from '@material-ui/icons/AddBox';
 
 import PreferenceDialog from '@/components/PreferenceDialog';
+
+import { Preference } from '@/classes/Preference';
+import { Device } from '@/classes/Device';
+
+import Router from '@/utils/endpointAPI';
 
 import '@/general.scss';
 
 // Definition of State
 type SchedulesPanelState = {
+    allDevices: Device[],
     selectedPreference: Preference | undefined,
     // Design state
     modalOpen: boolean,
@@ -23,17 +30,23 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
         super(props);
 
         this.state = {
+            allDevices: [],
             selectedPreference: undefined,
             // Design state
             modalOpen: false,
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.props.user?.load_preferences().finally(() => {
             this.forceUpdate();
             console.table(this.props.user?.preferences);
         });
+
+        if (this.props.user != undefined) {
+            let devices = await Router.load_devices(this.props.user.id);
+            this.setState(state => ({ allDevices: devices }));
+        }
     }
     
     render() {
@@ -77,13 +90,18 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
                                 </div>
                             }
                         </div>
+                        <div className="Buttons"> 
+                            <IconButton color="primary" component="span" onClick={() => {}}>
+                                <AddBoxIcon className="AddBoxIcon"/>
+                            </IconButton>
+                        </div>
                     </div>
                 </div>
                 <Dialog
                     open={this.state.modalOpen}
                     onClose={this._handleModalClose}
                 >
-                    <PreferenceDialog preference={this.state.selectedPreference} close_function={this._handleModalClose} />
+                    <PreferenceDialog devices={this.state.allDevices} preference={this.state.selectedPreference} close_function={this._handleModalClose} />
                 </Dialog>
             </div>
         )
@@ -92,6 +110,7 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
     // ============================== CHECK EVENTS ==============================
 
     _handleModalClose = () => {
+        this.state.selectedPreference?.save_sate_to_database();
         this.setState(state => ({ modalOpen: false }));
     }
 
@@ -101,6 +120,7 @@ class SchedulesPanel extends React.Component<ReduxType, SchedulesPanelState> {
         if (this.props.user == undefined || this.props.user.preferences == undefined) return;
         
         let selectedPreference = this.props.user.preferences.find((element) => element.id == id);
+        selectedPreference?.clear_save_state();
         
         this.setState(state => ({
             selectedPreference: selectedPreference,
