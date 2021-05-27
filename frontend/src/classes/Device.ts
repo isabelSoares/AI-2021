@@ -136,17 +136,17 @@ export class Device {
             await element.propertyValue?.load_property();
         }));
 
+        let sortedHistories = historyThisWeek.sort((a, b) => a.timestamp.diff(b.timestamp))
+
         // Divide by property
         let binnedByPropperty : any = {}
-        historyThisWeek.forEach(element => {
+        sortedHistories.forEach(element => {
             let propertyId = element.propertyValue?.property?.id;
             if (propertyId == undefined) return;
             
             if (!(propertyId in binnedByPropperty)) binnedByPropperty[propertyId] = [];
             binnedByPropperty[propertyId].push(element);
         });
-
-        
     
         let binnedByWeekdayHour : any = {};
         
